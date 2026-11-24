@@ -2,2104 +2,487 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PrintShop Studio | OllyIsAFish.com — Vice Vibes Print Editor</title>
-
-  <!-- Google Fonts: JetBrains Mono, Orbitron (Display), Righteous (Retro Script/Arcade), Oswald (Condensed HUD) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Orbitron:wght@700;900&family=Oswald:wght@700&family=Righteous&display=swap" rel="stylesheet">
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PrintShop | OllyIsAFish</title>
+  <!-- Replace YOUR_PAYPAL_CLIENT_ID with your live or sandbox PayPal Client ID -->
+  <script src="https://www.paypal.com/sdk/js?currency=USD&client-id=BAA40StwGiqW8zUc_WjTtH4QiXCFjdqd-BpXmdJYwU1WCpdkaZiCNl1sy0-IU0U-N51EihgabLR-7reF_Q"></script>
   <style>
     :root {
-      --bg-void: #0d0818;
-      --bg-panel: #161026;
-      --bg-panel-elevated: #1e1635;
-      --bg-bezel: #090512;
-      --border-dim: #2e224d;
-      --border-bright: #493678;
-      --neon-cyan: #00f0ff;
-      --neon-pink: #ff2a85;
-      --sunset-gold: #ffb800;
-      --text-main: #f3effc;
-      --text-muted: #988ab8;
+      --bg: #f4f1ea;
+      --panel: #ffffff;
+      --ink: #1e1e1e;
+      --accent: #d95d39;
+      --border: #2b2b2b;
+      --mono: 'JetBrains Mono', 'Courier New', monospace;
     }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      background-color: var(--bg-void);
-      color: var(--text-main);
-      font-family: 'JetBrains Mono', monospace;
-      overflow-x: hidden;
-      background-image:
-        radial-gradient(circle at 15% 15%, rgba(255, 42, 133, 0.08) 0%, transparent 45%),
-        radial-gradient(circle at 85% 85%, rgba(0, 240, 255, 0.08) 0%, transparent 45%);
+      font-family: var(--mono);
+      background: var(--bg);
+      color: var(--ink);
+      padding: 20px;
     }
-
-    .font-display {
-      font-family: 'Orbitron', sans-serif;
+    header {
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      border-bottom: 3px solid var(--border);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-
-    .font-retro {
-      font-family: 'Righteous', cursive;
+    h1 { margin: 0; font-size: 1.5rem; letter-spacing: -0.5px; }
+    .grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 20px;
     }
-
-    .font-hud {
-      font-family: 'Oswald', sans-serif;
+    @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--panel);
+      border: 2px solid var(--border);
+      box-shadow: 4px 4px 0 var(--border);
+      padding: 18px;
     }
-
-    /* Tactile 90s/2000s Industrial Studio Bevels & Scrollbars */
-    .studio-panel {
-      background: linear-gradient(180deg, #19122b 0%, #130d21 100%);
-      border: 1px solid var(--border-dim);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.07),
-        0 8px 24px rgba(0, 0, 0, 0.55);
+    .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid var(--border);
+      background: #e8e4da;
+      font-family: var(--mono);
+      font-weight: bold;
+      cursor: pointer;
     }
-
-    .studio-inset {
-      background-color: var(--bg-bezel);
-      border: 1px solid #261b42;
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.75);
-    }
-
-    .btn-tactile {
-      background: linear-gradient(180deg, #271d42 0%, #1b1330 100%);
-      border: 1px solid #3f3069;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.12),
-        0 2px 4px rgba(0, 0, 0, 0.5);
-      transition: all 0.12s ease;
-    }
-
-    .btn-tactile:hover:not(:disabled) {
-      border-color: var(--neon-cyan);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 0 12px rgba(0, 240, 255, 0.25);
-      transform: translateY(-1px);
-    }
-
-    .btn-tactile:active:not(:disabled) {
-      transform: translateY(1px);
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
-    }
-
-    .btn-tactile:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .btn-active-cyan {
-      background: linear-gradient(180deg, rgba(0, 240, 255, 0.22) 0%, rgba(0, 240, 255, 0.08) 100%);
-      border-color: var(--neon-cyan) !important;
-      color: #ffffff;
-      box-shadow: 0 0 14px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    }
-
-    .btn-neon-pink {
-      background: linear-gradient(135deg, #ff2a85 0%, #c81461 100%);
-      border: 1px solid #ff73af;
-      color: #fff;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.35),
-        0 4px 16px rgba(255, 42, 133, 0.45);
-      transition: all 0.15s ease;
-    }
-
-    .btn-neon-pink:hover {
-      filter: brightness(1.1);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.45),
-        0 6px 22px rgba(255, 42, 133, 0.65);
-      transform: translateY(-1px);
-    }
-
-    .btn-neon-pink:active {
-      transform: translateY(1px);
-    }
-
-    /* Custom Range Sliders */
-    input[type="range"] {
-      -webkit-appearance: none;
+    .tab.active { background: var(--accent); color: #fff; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    label { display: block; font-size: 0.78rem; font-weight: bold; margin-bottom: 4px; }
+    select, input[type="number"], input[type="range"], input[type="file"], button {
       width: 100%;
-      height: 6px;
-      background: #0a0614;
-      border-radius: 4px;
-      border: 1px solid #2e224d;
-      outline: none;
+      padding: 8px;
+      border: 2px solid var(--border);
+      font-family: var(--mono);
+      background: #fff;
     }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 18px;
-      border-radius: 3px;
-      background: linear-gradient(180deg, #00f0ff 0%, #0099a8 100%);
-      border: 1px solid #ffffff;
+    button.primary {
+      background: var(--ink);
+      color: #fff;
+      font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+      margin-top: 15px;
+      padding: 12px;
     }
-
-    input[type="range"]::-moz-range-thumb {
-      width: 14px;
-      height: 18px;
-      border-radius: 3px;
-      background: linear-gradient(180deg, #00f0ff 0%, #0099a8 100%);
-      border: 1px solid #ffffff;
+    button.primary:hover { background: var(--accent); }
+    .canvas-wrap {
+      margin-top: 15px;
+      background: #dcd8ce;
+      border: 2px dashed var(--border);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 300px;
+      padding: 10px;
+      overflow: hidden;
+    }
+    canvas {
+      max-width: 100%;
+      max-height: 360px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      background: #fff;
+    }
+    .cart-item {
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+    .cart-item img { width: 48px; height: 48px; object-fit: cover; border: 1px solid var(--border); }
+    .remove-btn {
+      width: auto;
+      padding: 4px 8px;
+      background: #ffeded;
+      color: #b00;
       cursor: pointer;
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+      font-size: 0.75rem;
     }
-
-    /* Workspace Checkerboard & Synthwave Grid */
-    .workspace-stage {
-      background-color: #090512;
-      background-image:
-        linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
-      background-size: 24px 24px;
+    .total-bar {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 15px 0;
+      padding-top: 10px;
+      border-top: 2px solid var(--border);
+      display: flex;
+      justify-content: space-between;
     }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    #order-confirmation {
+      display: none;
+      background: #e6f7ec;
+      border: 2px solid #1b7a3d;
+      padding: 15px;
+      margin-top: 15px;
     }
-    ::-webkit-scrollbar-track {
-      background: #0c0717;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #36275c;
-      border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #ff2a85;
-    }
-
-    /* Neon Text Glow Helpers */
-    .glow-pink {
-      text-shadow: 0 0 8px rgba(255, 42, 133, 0.8), 0 0 20px rgba(255, 42, 133, 0.4);
-    }
-    .glow-cyan {
-      text-shadow: 0 0 8px rgba(0, 240, 255, 0.8), 0 0 20px rgba(0, 240, 255, 0.4);
-    }
+    .hidden { display: none; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-[#ff2a85] selection:text-white">
+<body>
 
-  <!-- Top Industrial Header Bar -->
-  <header class="studio-panel border-x-0 border-t-0 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 z-20">
-    <div class="flex items-center gap-3">
-      <!-- Retro Palm / Sun Emblem SVG -->
-      <div class="w-9 h-9 rounded-lg bg-[#090512] border border-[#ff2a85]/60 flex items-center justify-center shadow-[0_0_15px_rgba(255,42,133,0.35)]">
-        <svg viewBox="0 0 40 40" class="w-7 h-7">
-          <defs>
-            <linearGradient id="logoSun" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ffb800"/>
-              <stop offset="55%" stop-color="#ff2a85"/>
-              <stop offset="100%" stop-color="#7000ff"/>
-            </linearGradient>
-          </defs>
-          <circle cx="20" cy="20" r="14" fill="url(#logoSun)"/>
-          <rect x="5" y="21" width="30" height="2" fill="#090512"/>
-          <rect x="5" y="25" width="30" height="2.5" fill="#090512"/>
-          <rect x="5" y="29.5" width="30" height="3" fill="#090512"/>
-          <path d="M22 33 Q21 22 25 14 M25 14 Q18 12 14 16 M25 14 Q20 9 15 10 M25 14 Q31 10 34 14 M25 14 Q30 15 32 19" stroke="#00f0ff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-        </svg>
+<header>
+  <h1>PRINTSHOP // OLLYISAFISH</h1>
+  <span>300 DPI CUSTOM PRINTS</span>
+</header>
+
+<div class="grid">
+  <!-- LEFT: EDITOR & CONFIGURATOR -->
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" id="tab-photo" onclick="setMode('photo')">PHOTO PRINT</button>
+      <button class="tab" id="tab-doc" onclick="setMode('doc')">DOCUMENT PRINT</button>
+    </div>
+
+    <label for="fileInput">1. UPLOAD IMAGE (PNG, JPG, WEBP)</label>
+    <input type="file" id="fileInput" accept="image/*" />
+
+    <!-- PHOTO CONTROLS -->
+    <div id="photo-controls" class="controls">
+      <div>
+        <label>PRINT SIZE</label>
+        <select id="photoSize" onchange="renderCanvas()">
+          <option value="4x6" data-w="1200" data-h="1800" data-price="1.50">4" x 6" ($1.50)</option>
+          <option value="5x7" data-w="1500" data-h="2100" data-price="3.00">5" x 7" ($3.00)</option>
+          <option value="8x10" data-w="2400" data-h="3000" data-price="6.50">8" x 10" ($6.50)</option>
+          <option value="11x14" data-w="3300" data-h="4200" data-price="12.00">11" x 14" ($12.00)</option>
+        </select>
       </div>
       <div>
-        <div class="flex items-center gap-2">
-          <h1 class="font-display font-black text-base sm:text-lg tracking-wider text-white">
-            PRINT<span class="text-[#00f0ff] glow-cyan">SHOP</span>
-            <span class="text-[#ff2a85] glow-pink text-xs sm:text-sm ml-1">VICE EDITION</span>
-          </h1>
-          <span class="hidden md:inline-block text-[10px] px-2 py-0.5 rounded bg-[#00f0ff]/10 border border-[#00f0ff]/40 text-[#00f0ff] font-bold">
-            300 DPI STUDIO
-          </span>
-        </div>
-        <p class="text-[11px] text-[#988ab8] leading-tight">
-          OllyIsAFish.com &bull; Custom Synthwave &amp; Leonida Print Lab
-        </p>
+        <label>FINISH</label>
+        <select id="photoFinish" onchange="renderCanvas()">
+          <option value="Glossy">Glossy</option>
+          <option value="Matte">Matte</option>
+        </select>
       </div>
-    </div>
-
-    <!-- Center Live Spec Badge -->
-    <div class="hidden xl:flex items-center gap-4 px-3.5 py-1.5 rounded-lg studio-inset text-xs">
-      <div class="flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-[#00f0ff] animate-pulse"></span>
-        <span class="text-[#988ab8]">FORMAT:</span>
-        <span id="headerSpecLabel" class="font-bold text-white">4x6 Postcard (Portrait)</span>
-      </div>
-      <span class="text-[#2e224d]">|</span>
       <div>
-        <span class="text-[#988ab8]">OUTPUT:</span>
-        <span id="headerResLabel" class="font-bold text-[#ffb800]">1200 &times; 1800 px</span>
+        <label>BRIGHTNESS (<span id="brightVal">100</span>%)</label>
+        <input type="range" id="brightness" min="50" max="150" value="100" oninput="renderCanvas()" />
+      </div>
+      <div>
+        <label>CONTRAST (<span id="contrastVal">100</span>%)</label>
+        <input type="range" id="contrast" min="50" max="150" value="100" oninput="renderCanvas()" />
+      </div>
+      <div>
+        <label>FILTER</label>
+        <select id="photoFilter" onchange="renderCanvas()">
+          <option value="none">Original Color</option>
+          <option value="grayscale(100%)">Black & White</option>
+          <option value="sepia(80%)">Warm Vintage</option>
+        </select>
+      </div>
+      <div>
+        <label>ORIENTATION</label>
+        <button type="button" onclick="toggleOrientation()">Rotate 90°</button>
       </div>
     </div>
 
-    <!-- Right Order Quantity & Checkout Trigger -->
-    <div class="flex items-center gap-2.5 ml-auto sm:ml-0">
-      <div class="flex items-center studio-inset rounded-lg px-2 py-1 gap-1.5">
-        <label for="qtyInput" class="text-[11px] text-[#988ab8] font-bold">QTY:</label>
-        <button id="qtyDecBtn" type="button" class="w-6 h-6 rounded bg-[#1e1635] hover:bg-[#ff2a85] text-white font-bold text-xs flex items-center justify-center transition">-</button>
-        <input id="qtyInput" type="number" min="1" max="25" value="1" class="w-9 bg-transparent text-center text-xs font-bold text-white focus:outline-none" />
-        <button id="qtyIncBtn" type="button" class="w-6 h-6 rounded bg-[#1e1635] hover:bg-[#00f0ff] hover:text-black text-white font-bold text-xs flex items-center justify-center transition">+</button>
+    <!-- DOCUMENT CONTROLS -->
+    <div id="doc-controls" class="controls hidden">
+      <div>
+        <label>PAPER SIZE</label>
+        <select id="docSize" onchange="renderCanvas()">
+          <option value="8.5x11" data-w="2550" data-h="3300" data-price="0.75">8.5" x 11" Letter ($0.75)</option>
+          <option value="11x17" data-w="3300" data-h="5100" data-price="1.75">11" x 17" Tabloid ($1.75)</option>
+        </select>
       </div>
-
-      <button id="openCheckoutBtn" type="button" class="btn-neon-pink px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer">
-        <span>PREVIEW &amp; ORDER</span>
-        <span id="headerTotalPrice" class="px-1.5 py-0.5 rounded bg-black/35 text-[#ffb800] font-extrabold">$12.00</span>
-      </button>
+      <div>
+        <label>PAPER TYPE</label>
+        <select id="docStock" onchange="renderCanvas()">
+          <option value="Standard_20lb" data-add="0">Standard 20lb (+$0.00)</option>
+          <option value="Cardstock_80lb" data-add="0.75">Heavy Cardstock 80lb (+$0.75)</option>
+          <option value="Glossy_Flyer" data-add="1.00">Glossy Presentation (+$1.00)</option>
+        </select>
+      </div>
+      <div>
+        <label>PAPER COLOR</label>
+        <select id="docColor" onchange="renderCanvas()">
+          <option value="#ffffff" data-name="White">Bright White</option>
+          <option value="#f7f3e3" data-name="Cream">Warm Cream</option>
+          <option value="#d9edf7" data-name="PastelBlue">Pastel Blue</option>
+          <option value="#fcf8e3" data-name="PastelYellow">Canary Yellow</option>
+          <option value="#f2dede" data-name="PastelPink">Soft Pink</option>
+        </select>
+      </div>
+      <div>
+        <label>FIT MODE</label>
+        <select id="docFit" onchange="renderCanvas()">
+          <option value="contain">Fit Whole Page (Margins)</option>
+          <option value="cover">Full Bleed Fill</option>
+        </select>
+      </div>
     </div>
-  </header>
 
-  <!-- Main 3-Column Studio Layout -->
-  <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 p-3 max-w-[1800px] w-full mx-auto">
-
-    <!-- LEFT SIDEBAR: Print Setup, Photo Upload, Color Grading (3 cols on lg) -->
-    <aside class="lg:col-span-3 flex flex-col gap-3 lg:max-h-[calc(100vh-84px)] lg:overflow-y-auto pr-0.5">
-
-      <!-- 1. Print Size & Orientation -->
-      <section class="studio-panel rounded-xl p-3.5">
-        <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#00f0ff] flex items-center gap-1.5">
-            <span>01.</span> PHOTO SPEC &amp; SIZE
-          </h2>
-          <span class="text-[10px] text-[#988ab8]">300 DPI</span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-1.5 mb-2.5" id="sizeSelectorGrid">
-          <button type="button" data-size="4x6" class="size-btn btn-tactile btn-active-cyan rounded-lg p-2 text-left">
-            <div class="text-xs font-bold">4&times;6 Postcard</div>
-            <div class="text-[10px] text-[#988ab8]">1200&times;1800 &bull; $12</div>
-          </button>
-          <button type="button" data-size="8x10" class="size-btn btn-tactile rounded-lg p-2 text-left">
-            <div class="text-xs font-bold">8&times;10 Print</div>
-            <div class="text-[10px] text-[#988ab8]">2400&times;3000 &bull; $18</div>
-          </button>
-          <button type="button" data-size="11x14" class="size-btn btn-tactile rounded-lg p-2 text-left">
-            <div class="text-xs font-bold">11&times;14 Poster</div>
-            <div class="text-[10px] text-[#988ab8]">3300&times;4200 &bull; $24</div>
-          </button>
-          <button type="button" data-size="12x18" class="size-btn btn-tactile rounded-lg p-2 text-left">
-            <div class="text-xs font-bold">12&times;18 Poster</div>
-            <div class="text-[10px] text-[#988ab8]">3600&times;5400 &bull; $30</div>
-          </button>
-        </div>
-
-        <!-- Orientation & Safe Zone Row -->
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="toggleOrientationBtn" type="button" class="btn-tactile rounded-lg py-1.5 px-2.5 text-xs font-bold flex items-center justify-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-[#ff2a85]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <span id="orientationText">Portrait</span>
-          </button>
-
-          <button id="toggleBleedBtn" type="button" class="btn-tactile btn-active-cyan rounded-lg py-1.5 px-2.5 text-xs font-bold flex items-center justify-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-[#00f0ff]"></span>
-            <span>Bleed Guide</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- 2. Base Photo Upload & Fit -->
-      <section class="studio-panel rounded-xl p-3.5">
-        <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#ff2a85] flex items-center gap-1.5">
-            <span>02.</span> PHOTO SOURCE
-          </h2>
-          <span class="text-[10px] text-[#988ab8]">JPG / PNG ONLY</span>
-        </div>
-
-        <label id="dropZoneLabel" for="photoInput" class="studio-inset rounded-xl p-3.5 border border-dashed border-[#493678] hover:border-[#00f0ff] transition cursor-pointer flex flex-col items-center justify-center text-center group">
-          <svg class="w-7 h-7 text-[#00f0ff] group-hover:scale-110 transition-transform mb-1.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <span class="text-xs font-bold text-white">Click or Drop Photo Here</span>
-          <span id="uploadedFileName" class="text-[10px] text-[#988ab8] mt-0.5 truncate max-w-full">Using Vice Demo Sunset Car</span>
-          <input id="photoInput" type="file" accept="image/jpeg,image/png" class="hidden" />
-        </label>
-
-        <div class="grid grid-cols-3 gap-1.5 mt-2.5">
-          <button id="fitPhotoBtn" type="button" class="btn-tactile rounded-lg py-1.5 px-2 text-[11px] font-bold">Fit Inside</button>
-          <button id="fillPhotoBtn" type="button" class="btn-tactile rounded-lg py-1.5 px-2 text-[11px] font-bold">Fill Print</button>
-          <button id="resetPhotoBtn" type="button" class="btn-tactile rounded-lg py-1.5 px-2 text-[11px] font-bold">Reset Pos</button>
-        </div>
-      </section>
-
-      <!-- 3. Vice Vibes Color Grading & Filters -->
-      <section class="studio-panel rounded-xl p-3.5">
-        <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#ffb800] flex items-center gap-1.5">
-            <span>03.</span> COLOR GRADE &amp; FX
-          </h2>
-          <button id="resetFiltersBtn" type="button" class="text-[10px] text-[#00f0ff] hover:underline">Reset FX</button>
-        </div>
-
-        <!-- Preset Filter Grid -->
-        <div class="grid grid-cols-2 gap-1.5 mb-3" id="filterPresetGrid">
-          <button type="button" data-filter="original" class="filter-btn btn-tactile btn-active-cyan rounded-lg py-1.5 px-2 text-xs font-bold text-left">
-            Original Clean
-          </button>
-          <button type="button" data-filter="viceneon" class="filter-btn btn-tactile rounded-lg py-1.5 px-2 text-xs font-bold text-left">
-            Vice Neon
-          </button>
-          <button type="button" data-filter="sunset86" class="filter-btn btn-tactile rounded-lg py-1.5 px-2 text-xs font-bold text-left">
-            Sunset '86
-          </button>
-          <button type="button" data-filter="loadingcel" class="filter-btn btn-tactile rounded-lg py-1.5 px-2 text-xs font-bold text-left">
-            Loading Cel
-          </button>
-          <button type="button" data-filter="midnight" class="filter-btn btn-tactile rounded-lg py-1.5 px-2 text-xs font-bold text-left">
-            Midnight Miami
-          </button>
-          <button type="button" data-filter="retrovhs" class="filter-btn btn-tactile rounded-lg py-1.5 px-2 text-xs font-bold text-left">
-            Retro VHS
-          </button>
-        </div>
-
-        <!-- Fine-Tune Sliders -->
-        <div class="space-y-2.5 text-[11px]">
-          <div>
-            <div class="flex justify-between mb-1">
-              <span class="text-[#988ab8]">Brightness</span>
-              <span id="valBrightness" class="text-white font-bold">100%</span>
-            </div>
-            <input id="sliderBrightness" type="range" min="50" max="160" value="100" />
-          </div>
-          <div>
-            <div class="flex justify-between mb-1">
-              <span class="text-[#988ab8]">Contrast</span>
-              <span id="valContrast" class="text-white font-bold">100%</span>
-            </div>
-            <input id="sliderContrast" type="range" min="60" max="180" value="100" />
-          </div>
-          <div>
-            <div class="flex justify-between mb-1">
-              <span class="text-[#988ab8]">Saturation</span>
-              <span id="valSaturation" class="text-white font-bold">100%</span>
-            </div>
-            <input id="sliderSaturation" type="range" min="0" max="200" value="100" />
-          </div>
-          <div>
-            <div class="flex justify-between mb-1">
-              <span class="text-[#988ab8]">Neon Vignette</span>
-              <span id="valVignette" class="text-white font-bold">20%</span>
-            </div>
-            <input id="sliderVignette" type="range" min="0" max="100" value="20" />
-          </div>
-
-          <label class="flex items-center justify-between pt-1 cursor-pointer select-none">
-            <span class="text-[#988ab8]">CRT / VHS Scanlines</span>
-            <input id="toggleScanlines" type="checkbox" class="accent-[#ff2a85] w-4 h-4 rounded cursor-pointer" />
-          </label>
-        </div>
-      </section>
-    </aside>
-
-    <!-- CENTER WORKSPACE: Interactive Canvas & Layer Toolbar (6 cols on lg) -->
-    <section class="lg:col-span-6 flex flex-col gap-2.5 min-h-[480px] lg:h-[calc(100vh-84px)]">
-
-      <!-- Top Layer Action Bar -->
-      <div class="studio-panel rounded-xl px-3 py-2 flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-1.5">
-          <span class="text-[11px] text-[#988ab8] mr-1 hidden sm:inline">SELECTED:</span>
-          <span id="selectedLayerBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-[#090512] border border-[#2e224d] text-[#00f0ff]">
-            Base Photo
-          </span>
-        </div>
-
-        <div class="flex items-center gap-1.5 flex-wrap">
-          <button id="layerUpBtn" type="button" title="Bring Forward" class="btn-tactile rounded-lg px-2.5 py-1.5 text-xs font-bold flex items-center gap-1">
-            <span>&uarr;</span><span class="hidden sm:inline">Forward</span>
-          </button>
-          <button id="layerDownBtn" type="button" title="Send Backward" class="btn-tactile rounded-lg px-2.5 py-1.5 text-xs font-bold flex items-center gap-1">
-            <span>&darr;</span><span class="hidden sm:inline">Back</span>
-          </button>
-          <button id="duplicateBtn" type="button" title="Duplicate Sticker/Text" class="btn-tactile rounded-lg px-2.5 py-1.5 text-xs font-bold">
-            Duplicate
-          </button>
-          <button id="deleteBtn" type="button" title="Delete Selected (Del)" class="btn-tactile rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#ff2a85]">
-            Delete
-          </button>
-          <button id="clearStickersBtn" type="button" title="Clear All Overlays" class="btn-tactile rounded-lg px-2.5 py-1.5 text-xs font-bold text-[#988ab8] hover:text-white">
-            Clear FX
-          </button>
-        </div>
+    <div class="controls">
+      <div>
+        <label>QUANTITY</label>
+        <input type="number" id="qty" value="1" min="1" max="100" />
       </div>
-
-      <!-- Canvas Container -->
-      <div id="canvasStage" class="flex-1 studio-panel workspace-stage rounded-xl relative flex items-center justify-center p-4 sm:p-6 overflow-hidden select-none">
-        <canvas id="editorCanvas" class="shadow-[0_0_45px_rgba(0,0,0,0.85),0_0_20px_rgba(255,42,133,0.18)] rounded-sm cursor-grab active:cursor-grabbing touch-none"></canvas>
-
-        <!-- Bottom Floating Tip Pill -->
-        <div class="absolute bottom-2.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#090512]/90 border border-[#2e224d] text-[10px] text-[#988ab8] pointer-events-none whitespace-nowrap">
-          Drag to move &bull; Corner handles to scale &bull; Top handle to rotate &bull; Arrows nudge
-        </div>
+      <div style="display:flex; align-items:flex-end;">
+        <button type="button" class="primary" style="margin-top:0;" onclick="addToCart()">+ ADD TO CART</button>
       </div>
-    </section>
+    </div>
 
-    <!-- RIGHT SIDEBAR: Vice Vibes Frames, Stickers & Custom Neon Text (3 cols on lg) -->
-    <aside class="lg:col-span-3 flex flex-col gap-3 lg:max-h-[calc(100vh-84px)] lg:overflow-y-auto pl-0.5">
-
-      <!-- 4. Full Print Frames -->
-      <section class="studio-panel rounded-xl p-3.5">
-        <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#00f0ff] flex items-center gap-1.5">
-            <span>04.</span> FULL PRINT FRAMES
-          </h2>
-          <span class="text-[10px] text-[#988ab8]">CLICK TO ADD</span>
-        </div>
-
-        <div class="grid grid-cols-1 gap-2">
-          <button type="button" data-add-element="frame_loading" class="add-el-btn btn-tactile rounded-lg p-2.5 flex items-center gap-3 text-left">
-            <div class="w-10 h-10 rounded studio-inset flex items-center justify-center shrink-0 text-[#ffb800]">
-              <svg viewBox="0 0 32 32" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="26" height="26"/>
-                <line x1="16" y1="3" x2="14" y2="29"/>
-                <line x1="3" y1="15" x2="29" y2="17"/>
-              </svg>
-            </div>
-            <div>
-              <div class="text-xs font-bold text-white">Leonida Loading Grid</div>
-              <div class="text-[10px] text-[#988ab8]">Segmented comic gutters &amp; border</div>
-            </div>
-          </button>
-
-          <button type="button" data-add-element="frame_postcard" class="add-el-btn btn-tactile rounded-lg p-2.5 flex items-center gap-3 text-left">
-            <div class="w-10 h-10 rounded studio-inset flex items-center justify-center shrink-0 text-[#ff2a85]">
-              <svg viewBox="0 0 32 32" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="26" height="26" rx="2"/>
-                <rect x="6" y="6" width="20" height="20" stroke="#00f0ff" stroke-width="1.2"/>
-                <text x="16" y="24" font-size="6" fill="#ffb800" stroke="none" text-anchor="middle" font-weight="bold">VICE</text>
-              </svg>
-            </div>
-            <div>
-              <div class="text-xs font-bold text-white">Vice Postcard Border</div>
-              <div class="text-[10px] text-[#988ab8]">Art Deco neon trim &amp; Leonida badge</div>
-            </div>
-          </button>
-
-          <button type="button" data-add-element="frame_polaroid" class="add-el-btn btn-tactile rounded-lg p-2.5 flex items-center gap-3 text-left">
-            <div class="w-10 h-10 rounded studio-inset flex items-center justify-center shrink-0 text-[#00f0ff]">
-              <svg viewBox="0 0 32 32" class="w-7 h-7" fill="none">
-                <rect x="4" y="2" width="24" height="28" fill="#1e1635" stroke="#00f0ff" stroke-width="1.8"/>
-                <rect x="7" y="5" width="18" height="17" fill="#090512" stroke="#ff2a85" stroke-width="1"/>
-                <line x1="4" y1="25" x2="28" y2="25" stroke="#ff2a85" stroke-width="1"/>
-              </svg>
-            </div>
-            <div>
-              <div class="text-xs font-bold text-white">Neon Sunset Polaroid</div>
-              <div class="text-[10px] text-[#988ab8]">Dark synthwave instant frame</div>
-            </div>
-          </button>
-        </div>
-      </section>
-
-      <!-- 5. Vice HUD & Synthwave Stickers -->
-      <section class="studio-panel rounded-xl p-3.5">
-        <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#ff2a85] flex items-center gap-1.5">
-            <span>05.</span> HUD &amp; STICKERS
-          </h2>
-          <span class="text-[10px] text-[#988ab8]">VECTOR SVG</span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" data-add-element="sticker_stars" class="add-el-btn btn-tactile rounded-lg p-2 text-center flex flex-col items-center justify-center gap-1">
-            <span class="text-sm tracking-widest text-[#ff2a85] glow-pink">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            <span class="text-[11px] font-bold">5-Star Wanted</span>
-          </button>
-
-          <button type="button" data-add-element="sticker_hud" class="add-el-btn btn-tactile rounded-lg p-2 text-center flex flex-col items-center justify-center gap-1">
-            <span class="font-hud text-sm font-bold text-[#00f0ff] tracking-wide">$999,999,999</span>
-            <span class="text-[11px] font-bold">Cash &amp; Clock HUD</span>
-          </button>
-
-          <button type="button" data-add-element="sticker_passed" class="add-el-btn btn-tactile rounded-lg p-2 text-center flex flex-col items-center justify-center gap-1">
-            <span class="font-retro text-xs text-[#ffb800]">VIBE PASSED</span>
-            <span class="text-[11px] font-bold">Mission Banner</span>
-          </button>
-
-          <button type="button" data-add-element="sticker_sunpalms" class="add-el-btn btn-tactile rounded-lg p-2 text-center flex flex-col items-center justify-center gap-1">
-            <span class="text-sm text-[#ffb800]">&#127796; &#9728; &#127796;</span>
-            <span class="text-[11px] font-bold">Sunset &amp; Palms</span>
-          </button>
-
-          <button type="button" data-add-element="sticker_flamingo" class="add-el-btn btn-tactile rounded-lg p-2 text-center flex flex-col items-center justify-center gap-1">
-            <span class="text-sm text-[#ff2a85] font-bold">NEON FLAMINGO</span>
-            <span class="text-[11px] font-bold">Miami Sign</span>
-          </button>
-
-          <button type="button" data-add-element="sticker_car" class="add-el-btn btn-tactile rounded-lg p-2 text-center flex flex-col items-center justify-center gap-1">
-            <span class="text-sm text-[#00f0ff] font-bold">80s TURBO</span>
-            <span class="text-[11px] font-bold">Wireframe Coupe</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- 6. Custom Neon Text Tool -->
-      <section class="studio-panel rounded-xl p-3.5">
-        <div class="flex items-center justify-between mb-2.5">
-          <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#ffb800] flex items-center gap-1.5">
-            <span>06.</span> CUSTOM NEON TEXT
-          </h2>
-        </div>
-
-        <div class="space-y-2">
-          <input id="customTextInput" type="text" maxlength="32" placeholder="e.g. VICE NIGHTS '86" class="w-full studio-inset rounded-lg px-3 py-2 text-xs text-white placeholder-[#5e5082] focus:outline-none focus:border-[#00f0ff]" />
-
-          <div class="grid grid-cols-2 gap-1.5">
-            <select id="textStyleSelect" class="studio-inset rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none">
-              <option value="neon_pink">Neon Pink Glow</option>
-              <option value="neon_cyan">Electric Cyan</option>
-              <option value="gold_stamp">Sunset Gold Stamp</option>
-              <option value="vice_script">Vice Retro Script</option>
-            </select>
-
-            <button id="addTextBtn" type="button" class="btn-tactile btn-active-cyan rounded-lg py-1.5 px-3 text-xs font-bold">
-              + Add Text
-            </button>
-          </div>
-        </div>
-      </section>
-
-    </aside>
-  </main>
-
-  <!-- Toast Notification Banner -->
-  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
-    <div class="studio-panel border-[#ff2a85] px-4 py-3 rounded-xl shadow-[0_0_25px_rgba(255,42,133,0.4)] flex items-center gap-2.5 text-xs">
-      <span id="toastIcon" class="w-2.5 h-2.5 rounded-full bg-[#ff2a85]"></span>
-      <span id="toastMessage" class="font-bold text-white">Notification</span>
+    <div class="canvas-wrap">
+      <canvas id="editorCanvas" width="1200" height="1800"></canvas>
     </div>
   </div>
 
-  <!-- High-Res Print Proof & Checkout Preview Modal -->
-  <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="studio-panel max-w-3xl w-full rounded-2xl overflow-hidden border-[#00f0ff]/50 shadow-[0_0_50px_rgba(0,240,255,0.2)] flex flex-col max-h-[92vh]">
+  <!-- RIGHT: CART & PAYPAL CHECKOUT -->
+  <div class="card">
+    <h2 style="margin-top:0;">YOUR CART (<span id="cartCount">0</span>)</h2>
+    <div id="cartList">
+      <p style="color:#666; font-size:0.85rem;">No prints added yet.</p>
+    </div>
 
-      <!-- Modal Header -->
-      <div class="px-5 py-3.5 bg-[#090512] border-b border-[#2e224d] flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#00f0ff]"></span>
-          <h3 class="font-display font-bold text-sm sm:text-base tracking-wide text-white">
-            300 DPI PRINT PROOF &amp; ORDER SUMMARY
-          </h3>
-        </div>
-        <button id="closeModalBtn" type="button" class="text-[#988ab8] hover:text-white text-lg font-bold px-2">&times;</button>
-      </div>
+    <div class="total-bar">
+      <span>TOTAL:</span>
+      <span>$<span id="cartTotal">0.00</span></span>
+    </div>
 
-      <!-- Modal Body -->
-      <div class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
-        <!-- High-Res Rendered Proof Preview -->
-        <div class="md:col-span-7 studio-inset rounded-xl p-3 flex flex-col items-center justify-center">
-          <div id="proofSpinner" class="py-16 text-center">
-            <div class="w-8 h-8 border-2 border-[#00f0ff] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-            <p class="text-xs text-[#00f0ff]">Rendering full 300 DPI print master...</p>
-          </div>
-          <img id="proofPreviewImg" alt="High-Resolution Print Proof" class="hidden max-h-[360px] w-auto rounded shadow-[0_0_25px_rgba(0,0,0,0.9)] border border-[#2e224d]" />
-          <p class="text-[10px] text-[#988ab8] mt-2 text-center">
-            Bleed guides &amp; selection boxes automatically stripped for printing.
-          </p>
-        </div>
+    <div id="paypal-button-container"></div>
+    <div id="status-msg" style="font-size:0.85rem; margin-top:10px; font-weight:bold;"></div>
 
-        <!-- Order Specs & Action Buttons -->
-        <div class="md:col-span-5 flex flex-col gap-3">
-          <div class="studio-inset rounded-xl p-3.5 space-y-2 text-xs">
-            <div class="flex justify-between">
-              <span class="text-[#988ab8]">Print Product:</span>
-              <span id="modalProductSize" class="font-bold text-white">4x6 Postcard</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-[#988ab8]">Orientation:</span>
-              <span id="modalOrientation" class="font-bold text-white">Portrait</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-[#988ab8]">Master Resolution:</span>
-              <span id="modalResolution" class="font-bold text-[#00f0ff]">1200 &times; 1800 px</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-[#988ab8]">Color Profile:</span>
-              <span id="modalFilterUsed" class="font-bold text-[#ff2a85]">Original Clean</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-[#988ab8]">Quantity:</span>
-              <span id="modalQty" class="font-bold text-white">1</span>
-            </div>
-            <div class="border-t border-[#2e224d] pt-2 flex justify-between text-sm">
-              <span class="font-bold text-white">Total Due:</span>
-              <span id="modalTotal" class="font-extrabold text-[#ffb800]">$12.00 USD</span>
-            </div>
-          </div>
-
-          <!-- Test Download Proof PNG -->
-          <button id="downloadProofBtn" type="button" class="btn-tactile rounded-xl py-2.5 px-4 text-xs font-bold flex items-center justify-center gap-2 text-[#00f0ff]">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            <span>Download 300 DPI Test PNG</span>
-          </button>
-
-          <!-- Step 2 PayPal + Google Drive Hook Placeholder -->
-          <div class="p-3 rounded-xl bg-[#00f0ff]/5 border border-[#00f0ff]/30">
-            <button id="paypalHookBtn" type="button" class="btn-neon-pink w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold tracking-wide cursor-pointer">
-              PROCEED TO PAYPAL &amp; SUBMIT
-            </button>
-            <p class="text-[10px] text-[#988ab8] text-center mt-1.5 leading-snug">
-              Step 2 Hook Ready: Will capture PayPal payment &amp; upload 300 DPI PNG directly to your Google Drive folder.
-            </p>
-          </div>
-        </div>
-      </div>
+    <div id="order-confirmation">
+      <strong>ORDER CONFIRMED!</strong><br>
+      Order Number: <span id="conf-order-id" style="font-size:1.1rem;"></span><br>
+      <small>Your high-res print files have been sent to the print queue. Save your order number for reference.</small>
     </div>
   </div>
+</div>
 
-  <script>
-    /**
-     * PRINTSHOP STUDIO — VICE EDITION (OllyIsAFish.com)
-     * Pure Vanilla HTML5 Canvas Engine with 300 DPI Export Pipeline
-     */
-    (() => {
-      // =========================================================================
-      // 1. PRINTIFY 300 DPI SPECIFICATIONS & PRICING
-      // =========================================================================
-      const PRINT_SPECS = {
-        '4x6':   { label: '4x6 Print',  w: 1200, h: 1800, price: 12.00 },
-        '8x10':  { label: '8x10 Print',    w: 2400, h: 3000, price: 18.00 },
-        '11x14': { label: '11x14 Poster',  w: 3300, h: 4200, price: 24.00 },
-        '12x18': { label: '12x18 Poster',  w: 3600, h: 5400, price: 30.00 }
+<script>
+  const APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
+  let mode = 'photo';
+  let uploadedImg = null;
+  let rotated = false;
+  let cart = [];
+
+  const canvas = document.getElementById('editorCanvas');
+  const ctx = canvas.getContext('2d');
+
+  document.getElementById('fileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        uploadedImg = img;
+        renderCanvas();
       };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 
-      const FILTER_NAMES = {
-        original:   'Original Clean',
-        viceneon:   'Vice Neon',
-        sunset86:   "Sunset '86",
-        loadingcel: 'Loading Cel',
-        midnight:   'Midnight Miami',
-        retrovhs:   'Retro VHS'
-      };
+  function setMode(newMode) {
+    mode = newMode;
+    document.getElementById('tab-photo').classList.toggle('active', mode === 'photo');
+    document.getElementById('tab-doc').classList.toggle('active', mode === 'doc');
+    document.getElementById('photo-controls').classList.toggle('hidden', mode !== 'photo');
+    document.getElementById('doc-controls').classList.toggle('hidden', mode !== 'doc');
+    renderCanvas();
+  }
 
-      // =========================================================================
-      // 2. APPLICATION STATE
-      // =========================================================================
-      const state = {
-        sizeKey: '4x6',
-        orientation: 'portrait', // 'portrait' | 'landscape'
-        showBleed: true,
-        quantity: 1,
+  function toggleOrientation() {
+    rotated = !rotated;
+    renderCanvas();
+  }
 
-        // Photo Grading & FX
-        filterPreset: 'original',
-        brightness: 100,
-        contrast: 100,
-        saturation: 100,
-        vignette: 20,
-        scanlines: false,
+  function renderCanvas() {
+    let targetW, targetH, bgColor = '#ffffff';
 
-        // Canvas Layers (Index 0 is always the base user photo)
-        layers: [],
-        selectedId: 'base_photo',
+    if (mode === 'photo') {
+      const opt = document.getElementById('photoSize').selectedOptions[0];
+      targetW = parseInt(opt.dataset.w);
+      targetH = parseInt(opt.dataset.h);
+      if (rotated) [targetW, targetH] = [targetH, targetW];
+    } else {
+      const opt = document.getElementById('docSize').selectedOptions[0];
+      targetW = parseInt(opt.dataset.w);
+      targetH = parseInt(opt.dataset.h);
+      bgColor = document.getElementById('docColor').value;
+    }
 
-        // Pointer Interaction State
-        interaction: {
-          mode: null, // 'move' | 'scale' | 'rotate'
-          startX: 0,
-          startY: 0,
-          origX: 0,
-          origY: 0,
-          origScaleX: 1,
-          origScaleY: 1,
-          origRotation: 0,
-          startDist: 1,
-          startAngle: 0
-        },
+    canvas.width = targetW;
+    canvas.height = targetH;
 
-        // Cached High-Res Proof Data URL
-        lastProofDataUrl: null
-      };
+    // Fill background (white for photos, selected paper color for documents)
+    ctx.save();
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, targetW, targetH);
+    ctx.restore();
 
-      // =========================================================================
-      // 3. DOM REFERENCES
-      // =========================================================================
-      const canvas = document.getElementById('editorCanvas');
-      const ctx = canvas.getContext('2d');
-      const canvasStage = document.getElementById('canvasStage');
+    if (!uploadedImg) {
+      ctx.fillStyle = '#888';
+      ctx.font = 'bold 48px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('PREVIEW AREA', targetW / 2, targetH / 2);
+      return;
+    }
 
-      // Offscreen buffer for pre-filtering the base photo cleanly
-      const photoBufferCanvas = document.createElement('canvas');
-      const photoBufferCtx = photoBufferCanvas.getContext('2d');
+    ctx.save();
+    if (mode === 'photo') {
+      const b = document.getElementById('brightness').value;
+      const c = document.getElementById('contrast').value;
+      const f = document.getElementById('photoFilter').value;
+      document.getElementById('brightVal').textContent = b;
+      document.getElementById('contrastVal').textContent = c;
+      ctx.filter = `brightness(${b}%) contrast(${c}%) ${f === 'none' ? '' : f}`;
+    }
 
-      // =========================================================================
-      // 4. HELPER UTILITIES & TOASTS
-      // =========================================================================
-      let toastTimeout = null;
-      function showToast(msg, type = 'pink') {
-        const banner = document.getElementById('toastBanner');
-        const msgEl = document.getElementById('toastMessage');
-        const iconEl = document.getElementById('toastIcon');
+    // Calculate aspect-ratio fit (cover for photo, contain/cover for document)
+    const fitMode = mode === 'photo' ? 'cover' : document.getElementById('docFit').value;
+    const scale = fitMode === 'cover'
+      ? Math.max(targetW / uploadedImg.width, targetH / uploadedImg.height)
+      : Math.min((targetW * 0.92) / uploadedImg.width, (targetH * 0.92) / uploadedImg.height);
 
-        msgEl.textContent = msg;
-        iconEl.style.backgroundColor = type === 'cyan' ? '#00f0ff' : '#ff2a85';
-        banner.firstElementChild.style.borderColor = type === 'cyan' ? '#00f0ff' : '#ff2a85';
+    const drawW = uploadedImg.width * scale;
+    const drawH = uploadedImg.height * scale;
+    const offsetX = (targetW - drawW) / 2;
+    const offsetY = (targetH - drawH) / 2;
 
-        banner.classList.remove('translate-y-24', 'opacity-0');
-        clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => {
-          banner.classList.add('translate-y-24', 'opacity-0');
-        }, 3200);
+    ctx.drawImage(uploadedImg, offsetX, offsetY, drawW, drawH);
+    ctx.restore();
+  }
+
+  function addToCart() {
+    if (!uploadedImg) {
+      alert('Please upload a photo or document image first.');
+      return;
+    }
+
+    const qty = Math.max(1, parseInt(document.getElementById('qty').value) || 1);
+    let unitPrice = 0, specs = '';
+
+    if (mode === 'photo') {
+      const sizeOpt = document.getElementById('photoSize').selectedOptions[0];
+      const finish = document.getElementById('photoFinish').value;
+      unitPrice = parseFloat(sizeOpt.dataset.price);
+      specs = `${sizeOpt.value}_${finish}`;
+    } else {
+      const sizeOpt = document.getElementById('docSize').selectedOptions[0];
+      const stockOpt = document.getElementById('docStock').selectedOptions[0];
+      const colorOpt = document.getElementById('docColor').selectedOptions[0];
+      unitPrice = parseFloat(sizeOpt.dataset.price) + parseFloat(stockOpt.dataset.add);
+      specs = `${sizeOpt.value}_${stockOpt.value}_${colorOpt.dataset.name}`;
+    }
+
+    // Export high-res PNG from the current 300 DPI canvas
+    const highResPng = canvas.toDataURL('image/png');
+
+    cart.push({
+      id: Date.now(),
+      type: mode.toUpperCase(),
+      specs: specs,
+      qty: qty,
+      unitPrice: unitPrice,
+      subtotal: unitPrice * qty,
+      imageData: highResPng
+    });
+
+    updateCartUI();
+  }
+
+  function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
+    updateCartUI();
+  }
+
+  function getCartTotal() {
+    return cart.reduce((sum, item) => sum + item.subtotal, 0);
+  }
+
+  function updateCartUI() {
+    const list = document.getElementById('cartList');
+    document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.qty, 0);
+    document.getElementById('cartTotal').textContent = getCartTotal().toFixed(2);
+
+    if (cart.length === 0) {
+      list.innerHTML = '<p style="color:#666; font-size:0.85rem;">No prints added yet.</p>';
+      return;
+    }
+
+    list.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <img src="${item.imageData}" alt="Preview" />
+        <div style="flex:1;">
+          <strong>${item.type}</strong> (${item.specs})<br>
+          Qty: ${item.qty} × $${item.unitPrice.toFixed(2)} = <strong>$${item.subtotal.toFixed(2)}</strong>
+        </div>
+        <button class="remove-btn" onclick="removeFromCart(${item.id})">X</button>
+      </div>
+    `).join('');
+  }
+
+  // PayPal Smart Buttons Integration
+  paypal.Buttons({
+    createOrder: function(data, actions) {
+      const total = getCartTotal();
+      if (total <= 0) {
+        alert('Your cart is empty!');
+        return;
       }
+      return actions.order.create({
+        purchase_units: [{
+          description: 'OllyIsAFish PrintShop Custom Order',
+          amount: { value: total.toFixed(2) }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      document.getElementById('status-msg').textContent = 'Payment approved! Uploading high-res print files...';
+      return actions.order.capture().then(async function(details) {
+        const orderId = 'ORD-' + Date.now().toString().slice(-6);
+        const shipping = details.purchase_units[0].shipping;
+        const addr = shipping ? `${shipping.address.address_line_1}\n${shipping.address.admin_area_2}, ${shipping.address.admin_area_1} ${shipping.address.postal_code}` : 'No shipping address provided';
 
-      function getTargetPrintDimensions() {
-        const spec = PRINT_SPECS[state.sizeKey];
-        if (state.orientation === 'portrait') {
-          return { width: spec.w, height: spec.h };
-        }
-        return { width: spec.h, height: spec.w };
-      }
+        const payload = {
+          orderId: orderId,
+          paypalOrderId: details.id,
+          total: getCartTotal().toFixed(2),
+          customer: {
+            name: shipping ? shipping.name.full_name : details.payer.name.given_name,
+            email: details.payer.email_address,
+            address: addr
+          },
+          items: cart
+        };
 
-      function generateId(prefix = 'el') {
-        return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-      }
-
-      // =========================================================================
-      // 5. DEFAULT SYNTHWAVE DEMO PHOTO GENERATOR (SO CANVAS IS INSTANTLY ALIVE)
-      // =========================================================================
-      function createDefaultDemoImage() {
-        const demoCanvas = document.createElement('canvas');
-        demoCanvas.width = 1200;
-        demoCanvas.height = 1600;
-        const dctx = demoCanvas.getContext('2d');
-
-        // Deep Twilight Sky Gradient
-        const sky = dctx.createLinearGradient(0, 0, 0, 1050);
-        sky.addColorStop(0, '#0b0320');
-        sky.addColorStop(0.45, '#3b0954');
-        sky.addColorStop(0.78, '#d41c6c');
-        sky.addColorStop(1, '#ff9e00');
-        dctx.fillStyle = sky;
-        dctx.fillRect(0, 0, 1200, 1050);
-
-        // Glowing Striped Synthwave Sun
-        dctx.save();
-        const sunGrad = dctx.createLinearGradient(0, 320, 0, 880);
-        sunGrad.addColorStop(0, '#fff275');
-        sunGrad.addColorStop(0.5, '#ff7b00');
-        sunGrad.addColorStop(1, '#ff007f');
-        dctx.fillStyle = sunGrad;
-        dctx.beginPath();
-        dctx.arc(600, 620, 270, 0, Math.PI * 2);
-        dctx.fill();
-
-        // Sun horizontal cutouts
-        dctx.fillStyle = '#5c0c58';
-        for (let y = 630; y < 890; y += 28) {
-          const h = (y - 610) * 0.055;
-          dctx.fillRect(320, y, 560, h);
-        }
-        dctx.restore();
-
-        // Distant Miami Skyline Silhouettes
-        dctx.fillStyle = '#14062b';
-        const buildings = [
-          [40, 860, 90, 190], [140, 810, 75, 240], [225, 890, 110, 160],
-          [860, 830, 85, 220], [955, 780, 95, 270], [1060, 850, 110, 200]
-        ];
-        buildings.forEach(([bx, by, bw, bh]) => {
-          dctx.fillRect(bx, by, bw, bh);
-          dctx.fillStyle = '#00f0ff';
-          for (let wy = by + 18; wy < by + bh - 20; wy += 22) {
-            dctx.fillRect(bx + 14, wy, 8, 8);
-            dctx.fillRect(bx + bw - 22, wy, 8, 8);
-          }
-          dctx.fillStyle = '#14062b';
-        });
-
-        // Neon Perspective Floor Grid
-        dctx.fillStyle = '#090314';
-        dctx.fillRect(0, 1050, 1200, 550);
-        dctx.strokeStyle = '#ff2a85';
-        dctx.lineWidth = 3;
-        for (let i = -12; i <= 12; i++) {
-          dctx.beginPath();
-          dctx.moveTo(600 + i * 45, 1050);
-          dctx.lineTo(600 + i * 190, 1600);
-          dctx.stroke();
-        }
-        for (let row = 0; row < 10; row++) {
-          const y = 1050 + Math.pow(row / 9, 1.8) * 550;
-          dctx.beginPath();
-          dctx.moveTo(0, y);
-          dctx.lineTo(1200, y);
-          dctx.stroke();
-        }
-
-        // Twin Silhouette Palm Trees
-        function drawDemoPalm(baseX, baseY, lean, scale) {
-          dctx.save();
-          dctx.translate(baseX, baseY);
-          dctx.scale(scale, scale);
-          dctx.strokeStyle = '#090214';
-          dctx.lineWidth = 24;
-          dctx.lineCap = 'round';
-          dctx.beginPath();
-          dctx.moveTo(0, 0);
-          dctx.quadraticCurveTo(lean * 0.5, -260, lean, -520);
-          dctx.stroke();
-
-          dctx.translate(lean, -520);
-          const frondAngles = [-2.6, -2.0, -1.3, -0.5, 0.2, 0.8];
-          frondAngles.forEach(ang => {
-            dctx.save();
-            dctx.rotate(ang);
-            dctx.fillStyle = '#090214';
-            dctx.beginPath();
-            dctx.moveTo(0, 0);
-            dctx.quadraticCurveTo(95, -45, 190, 20);
-            dctx.quadraticCurveTo(95, -5, 0, 12);
-            dctx.fill();
-            dctx.restore();
-          });
-          dctx.restore();
-        }
-        drawDemoPalm(150, 1120, 70, 1.05);
-        drawDemoPalm(1060, 1130, -80, 1.15);
-
-        const img = new Image();
-        img.src = demoCanvas.toDataURL('image/png');
-        return img;
-      }
-
-      // =========================================================================
-      // 6. PHOTO COLOR GRADING & FILTER PIPELINE
-      // =========================================================================
-      function rebuildFilteredPhotoBuffer(photoLayer) {
-        const img = photoLayer.image;
-        if (!img || !img.complete || img.naturalWidth === 0) return;
-
-        const w = img.naturalWidth;
-        const h = img.naturalHeight;
-        photoBufferCanvas.width = w;
-        photoBufferCanvas.height = h;
-
-        photoBufferCtx.save();
-        photoBufferCtx.clearRect(0, 0, w, h);
-
-        // Combine base slider values with preset filter adjustments
-        let b = state.brightness;
-        let c = state.contrast;
-        let s = state.saturation;
-        let hue = 0;
-
-        switch (state.filterPreset) {
-          case 'viceneon':
-            c *= 1.18;
-            s *= 1.38;
-            b *= 1.04;
-            break;
-          case 'sunset86':
-            c *= 1.10;
-            s *= 1.25;
-            hue = -12;
-            break;
-          case 'loadingcel':
-            c *= 1.48;
-            s *= 1.55;
-            b *= 1.05;
-            break;
-          case 'midnight':
-            c *= 1.22;
-            s *= 1.15;
-            b *= 0.94;
-            hue = 14;
-            break;
-          case 'retrovhs':
-            c *= 0.92;
-            s *= 1.20;
-            b *= 1.06;
-            break;
-        }
-
-        photoBufferCtx.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%) hue-rotate(${hue}deg)`;
-        photoBufferCtx.drawImage(img, 0, 0, w, h);
-        photoBufferCtx.filter = 'none';
-
-        // Color Duotone / Synthwave Gradient Overlays per Preset
-        if (state.filterPreset === 'viceneon') {
-          photoBufferCtx.globalCompositeOperation = 'screen';
-          const grad = photoBufferCtx.createLinearGradient(0, 0, w, h);
-          grad.addColorStop(0, 'rgba(255, 42, 133, 0.28)');
-          grad.addColorStop(1, 'rgba(0, 240, 255, 0.26)');
-          photoBufferCtx.fillStyle = grad;
-          photoBufferCtx.fillRect(0, 0, w, h);
-        } else if (state.filterPreset === 'sunset86') {
-          photoBufferCtx.globalCompositeOperation = 'overlay';
-          const grad = photoBufferCtx.createLinearGradient(0, 0, 0, h);
-          grad.addColorStop(0, 'rgba(255, 184, 0, 0.42)');
-          grad.addColorStop(1, 'rgba(255, 42, 133, 0.35)');
-          photoBufferCtx.fillStyle = grad;
-          photoBufferCtx.fillRect(0, 0, w, h);
-        } else if (state.filterPreset === 'loadingcel') {
-          // Subtle posterized cel-shaded ink contrast wash
-          photoBufferCtx.globalCompositeOperation = 'hard-light';
-          photoBufferCtx.fillStyle = 'rgba(255, 184, 0, 0.14)';
-          photoBufferCtx.fillRect(0, 0, w, h);
-        } else if (state.filterPreset === 'midnight') {
-          photoBufferCtx.globalCompositeOperation = 'color';
-          const grad = photoBufferCtx.createLinearGradient(0, 0, w, h);
-          grad.addColorStop(0, 'rgba(28, 12, 74, 0.55)');
-          grad.addColorStop(1, 'rgba(0, 210, 255, 0.38)');
-          photoBufferCtx.fillStyle = grad;
-          photoBufferCtx.fillRect(0, 0, w, h);
-        } else if (state.filterPreset === 'retrovhs') {
-          photoBufferCtx.globalCompositeOperation = 'lighten';
-          photoBufferCtx.fillStyle = 'rgba(35, 12, 48, 0.38)';
-          photoBufferCtx.fillRect(0, 0, w, h);
-        }
-
-        photoBufferCtx.restore();
-      }
-
-      // =========================================================================
-      // 7. CUSTOM VECTOR RENDERERS FOR VICE VIBES FRAMES, STICKERS & TEXT
-      // =========================================================================
-      function drawVectorElement(targetCtx, layer, canvasW, canvasH) {
-        targetCtx.save();
-
-        // Full-frame overlays scale directly to the print canvas dimensions
-        if (layer.isFullFrame) {
-          const fw = canvasW;
-          const fh = canvasH;
-          targetCtx.translate(layer.x * canvasW, layer.y * canvasH);
-          targetCtx.rotate(layer.rotation);
-          targetCtx.scale(layer.scaleX, layer.scaleY);
-
-          if (layer.subType === 'frame_loading') {
-            // Leonida Loading Screen Segmented Comic Grid
-            const border = Math.min(fw, fh) * 0.032;
-            const gutter = Math.min(fw, fh) * 0.018;
-
-            targetCtx.strokeStyle = '#090512';
-            targetCtx.lineWidth = border * 2;
-            targetCtx.strokeRect(-fw / 2, -fh / 2, fw, fh);
-
-            // Neon outer pinstripe
-            targetCtx.strokeStyle = '#00f0ff';
-            targetCtx.lineWidth = border * 0.25;
-            targetCtx.strokeRect(-fw / 2 + border * 0.65, -fh / 2 + border * 0.65, fw - border * 1.3, fh - border * 1.3);
-
-            // Diagonal comic panel dividers
-            targetCtx.strokeStyle = '#090512';
-            targetCtx.lineWidth = gutter;
-            targetCtx.beginPath();
-            // Horizontal split
-            targetCtx.moveTo(-fw / 2, -fh * 0.06);
-            targetCtx.lineTo(fw / 2, fh * 0.05);
-            // Top vertical split
-            targetCtx.moveTo(fw * 0.04, -fh / 2);
-            targetCtx.lineTo(-fw * 0.05, -fh * 0.01);
-            // Bottom vertical split
-            targetCtx.moveTo(-fw * 0.08, 0);
-            targetCtx.lineTo(fw * 0.06, fh / 2);
-            targetCtx.stroke();
-
-            // Thin neon highlights along gutters
-            targetCtx.strokeStyle = '#ff2a85';
-            targetCtx.lineWidth = gutter * 0.22;
-            targetCtx.stroke();
-
-          } else if (layer.subType === 'frame_postcard') {
-            // Vice Postcard Art Deco Border
-            const m1 = Math.min(fw, fh) * 0.04;
-            const m2 = Math.min(fw, fh) * 0.062;
-
-            targetCtx.shadowColor = '#ff2a85';
-            targetCtx.shadowBlur = m1 * 0.6;
-            targetCtx.strokeStyle = '#ff2a85';
-            targetCtx.lineWidth = m1 * 0.25;
-            targetCtx.strokeRect(-fw / 2 + m1, -fh / 2 + m1, fw - m1 * 2, fh - m1 * 2);
-
-            targetCtx.shadowColor = '#00f0ff';
-            targetCtx.strokeStyle = '#00f0ff';
-            targetCtx.lineWidth = m1 * 0.14;
-            targetCtx.strokeRect(-fw / 2 + m2, -fh / 2 + m2, fw - m2 * 2, fh - m2 * 2);
-
-            // Bottom Right Retro Postcard Badge
-            targetCtx.shadowBlur = 0;
-            const badgeW = fw * 0.56;
-            const badgeH = fh * 0.11;
-            const bx = fw / 2 - m2 - badgeW - fw * 0.02;
-            const by = fh / 2 - m2 - badgeH - fh * 0.02;
-
-            targetCtx.fillStyle = 'rgba(13, 8, 24, 0.88)';
-            targetCtx.strokeStyle = '#ffb800';
-            targetCtx.lineWidth = m1 * 0.15;
-            targetCtx.beginPath();
-            targetCtx.roundRect(bx, by, badgeW, badgeH, m1 * 0.3);
-            targetCtx.fill();
-            targetCtx.stroke();
-
-            targetCtx.fillStyle = '#00f0ff';
-            targetCtx.font = `700 ${Math.round(badgeH * 0.24)}px "JetBrains Mono", monospace`;
-            targetCtx.textAlign = 'center';
-            targetCtx.fillText('GREETINGS FROM', bx + badgeW / 2, by + badgeH * 0.38);
-
-            targetCtx.fillStyle = '#ff2a85';
-            targetCtx.shadowColor = '#ff2a85';
-            targetCtx.shadowBlur = 12;
-            targetCtx.font = `400 ${Math.round(badgeH * 0.48)}px "Righteous", cursive`;
-            targetCtx.fillText('LEONIDA COAST', bx + badgeW / 2, by + badgeH * 0.84);
-
-          } else if (layer.subType === 'frame_polaroid') {
-            // Neon Sunset Polaroid Frame
-            const side = Math.min(fw, fh) * 0.065;
-            const top = side;
-            const bottom = fh * 0.21;
-
-            targetCtx.fillStyle = '#120b24';
-            targetCtx.beginPath();
-            // Outer rect
-            targetCtx.rect(-fw / 2, -fh / 2, fw, fh);
-            // Inner cutout (counter-clockwise)
-            const ix = -fw / 2 + side;
-            const iy = -fh / 2 + top;
-            const iw = fw - side * 2;
-            const ih = fh - top - bottom;
-            targetCtx.moveTo(ix, iy);
-            targetCtx.lineTo(ix, iy + ih);
-            targetCtx.lineTo(ix + iw, iy + ih);
-            targetCtx.lineTo(ix + iw, iy);
-            targetCtx.closePath();
-            targetCtx.fill();
-
-            // Inner glowing border
-            targetCtx.strokeStyle = '#00f0ff';
-            targetCtx.lineWidth = side * 0.08;
-            targetCtx.strokeRect(ix, iy, iw, ih);
-
-            // Synthwave horizon lines in bottom Polaroid chin
-            const chinTop = iy + ih + side * 0.35;
-            const chinBottom = fh / 2 - side * 0.35;
-            targetCtx.strokeStyle = 'rgba(255, 42, 133, 0.35)';
-            targetCtx.lineWidth = 2;
-            for (let y = chinTop; y <= chinBottom; y += (chinBottom - chinTop) / 4) {
-              targetCtx.beginPath();
-              targetCtx.moveTo(-fw / 2 + side, y);
-              targetCtx.lineTo(fw / 2 - side, y);
-              targetCtx.stroke();
-            }
-
-            targetCtx.fillStyle = '#ffb800';
-            targetCtx.font = `400 ${Math.round(bottom * 0.28)}px "Righteous", cursive`;
-            targetCtx.textAlign = 'center';
-            targetCtx.fillText("VICE NIGHTS '86 // MEMORIES", 0, iy + ih + bottom * 0.62);
-          }
-
-          targetCtx.restore();
-          return;
-        }
-
-        // Movable Stickers & Custom Text
-        const px = layer.x * canvasW;
-        const py = layer.y * canvasH;
-        // Normalize sticker size relative to canvas shortest side so 300 DPI export matches preview identically
-        const unit = Math.min(canvasW, canvasH) / 600;
-
-        targetCtx.translate(px, py);
-        targetCtx.rotate(layer.rotation);
-        targetCtx.scale(layer.scaleX * unit, layer.scaleY * unit);
-
-        if (layer.subType === 'sticker_stars') {
-          // 5-Star Wanted Level HUD
-          const w = layer.baseW;
-          const h = layer.baseH;
-          targetCtx.fillStyle = 'rgba(9, 5, 18, 0.72)';
-          targetCtx.beginPath();
-          targetCtx.roundRect(-w / 2, -h / 2, w, h, 10);
-          targetCtx.fill();
-
-          const starSpacing = w / 5.4;
-          for (let i = 0; i < 5; i++) {
-            const sx = -w / 2 + starSpacing * (i + 0.7);
-            drawStarShape(targetCtx, sx, 0, 5, 18, 8, i < 4 ? '#ff2a85' : '#00f0ff');
-          }
-
-        } else if (layer.subType === 'sticker_hud') {
-          // Vice Cash & Arcade Clock HUD
-          targetCtx.textAlign = 'right';
-          targetCtx.shadowColor = '#000000';
-          targetCtx.shadowBlur = 6;
-          targetCtx.lineWidth = 4;
-          targetCtx.strokeStyle = '#090512';
-
-          targetCtx.font = '700 38px "Oswald", sans-serif';
-          targetCtx.strokeText('23:59', 135, -8);
-          targetCtx.fillStyle = '#00f0ff';
-          targetCtx.fillText('23:59', 135, -8);
-
-          targetCtx.font = '700 44px "Oswald", sans-serif';
-          targetCtx.strokeText('$999,999,999', 135, 38);
-          targetCtx.fillStyle = '#ff2a85';
-          targetCtx.fillText('$999,999,999', 135, 38);
-
-        } else if (layer.subType === 'sticker_passed') {
-          // Mission / Vibe Check Passed Banner
-          const w = layer.baseW;
-          const h = layer.baseH;
-          targetCtx.fillStyle = 'rgba(13, 8, 24, 0.88)';
-          targetCtx.strokeStyle = '#ffb800';
-          targetCtx.lineWidth = 4;
-          targetCtx.beginPath();
-          targetCtx.roundRect(-w / 2, -h / 2, w, h, 12);
-          targetCtx.fill();
-          targetCtx.stroke();
-
-          targetCtx.textAlign = 'center';
-          targetCtx.shadowColor = '#ffb800';
-          targetCtx.shadowBlur = 14;
-          targetCtx.fillStyle = '#ffb800';
-          targetCtx.font = '400 34px "Righteous", cursive';
-          targetCtx.fillText('VIBE CHECK PASSED!', 0, -4);
-
-          targetCtx.shadowBlur = 0;
-          targetCtx.fillStyle = '#00f0ff';
-          targetCtx.font = '700 18px "JetBrains Mono", monospace';
-          targetCtx.fillText('RESPECT +100  //  LEONIDA', 0, 26);
-
-        } else if (layer.subType === 'sticker_sunpalms') {
-          // Striped Sunset & Twin Palms Badge
-          const sunGrad = targetCtx.createLinearGradient(0, -90, 0, 70);
-          sunGrad.addColorStop(0, '#ffb800');
-          sunGrad.addColorStop(0.6, '#ff2a85');
-          sunGrad.addColorStop(1, '#7000ff');
-          targetCtx.fillStyle = sunGrad;
-          targetCtx.beginPath();
-          targetCtx.arc(0, -10, 82, 0, Math.PI * 2);
-          targetCtx.fill();
-
-          // Cutout stripes
-          targetCtx.fillStyle = '#0d0818';
-          targetCtx.fillRect(-85, 12, 170, 6);
-          targetCtx.fillRect(-85, 26, 170, 8);
-          targetCtx.fillRect(-85, 42, 170, 10);
-
-          // Palms silhouette
-          targetCtx.strokeStyle = '#00f0ff';
-          targetCtx.lineWidth = 5;
-          targetCtx.lineCap = 'round';
-          targetCtx.beginPath();
-          targetCtx.moveTo(-35, 75);
-          targetCtx.quadraticCurveTo(-45, 10, -25, -45);
-          targetCtx.moveTo(35, 75);
-          targetCtx.quadraticCurveTo(45, 15, 28, -35);
-          targetCtx.stroke();
-
-          // Fronds
-          [[-25, -45], [28, -35]].forEach(([fx, fy]) => {
-            for (let a = -2.5; a <= 0.6; a += 0.75) {
-              targetCtx.beginPath();
-              targetCtx.moveTo(fx, fy);
-              targetCtx.quadraticCurveTo(fx + Math.cos(a) * 28, fy + Math.sin(a) * 28 - 10, fx + Math.cos(a) * 48, fy + Math.sin(a) * 32 + 12);
-              targetCtx.stroke();
-            }
+        try {
+          // Send to Google Apps Script (no-cors mode avoids browser preflight block while still executing POST)
+          await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload)
           });
 
-        } else if (layer.subType === 'sticker_flamingo') {
-          // Neon Pink Flamingo Sign
-          targetCtx.shadowColor = '#ff2a85';
-          targetCtx.shadowBlur = 18;
-          targetCtx.strokeStyle = '#ff2a85';
-          targetCtx.lineWidth = 6;
-          targetCtx.lineCap = 'round';
-          targetCtx.lineJoin = 'round';
-
-          targetCtx.beginPath();
-          // Body oval
-          targetCtx.ellipse(-5, 0, 38, 22, -0.2, 0, Math.PI * 2);
-          targetCtx.stroke();
-
-          // S-curve Neck & Head
-          targetCtx.beginPath();
-          targetCtx.moveTo(28, -8);
-          targetCtx.bezierCurveTo(55, -35, 15, -75, 42, -82);
-          targetCtx.lineTo(56, -74);
-          targetCtx.stroke();
-
-          // Standing Legs
-          targetCtx.strokeStyle = '#00f0ff';
-          targetCtx.shadowColor = '#00f0ff';
-          targetCtx.beginPath();
-          targetCtx.moveTo(-8, 22);
-          targetCtx.lineTo(-8, 85);
-          targetCtx.moveTo(2, 21);
-          targetCtx.lineTo(22, 52);
-          targetCtx.lineTo(-4, 62);
-          targetCtx.stroke();
-
-        } else if (layer.subType === 'sticker_car') {
-          // 80s Wedge Supercar Wireframe Silhouette
-          targetCtx.shadowColor = '#00f0ff';
-          targetCtx.shadowBlur = 14;
-          targetCtx.strokeStyle = '#00f0ff';
-          targetCtx.lineWidth = 4;
-          targetCtx.lineJoin = 'round';
-
-          targetCtx.beginPath();
-          targetCtx.moveTo(-125, 22);
-          targetCtx.lineTo(-115, -4);
-          targetCtx.lineTo(-45, -14);
-          targetCtx.lineTo(5, -38);
-          targetCtx.lineTo(75, -36);
-          targetCtx.lineTo(118, -8);
-          targetCtx.lineTo(125, 22);
-          targetCtx.closePath();
-          targetCtx.stroke();
-
-          // Wheels
-          targetCtx.strokeStyle = '#ff2a85';
-          targetCtx.shadowColor = '#ff2a85';
-          [-72, 74].forEach(wx => {
-            targetCtx.beginPath();
-            targetCtx.arc(wx, 22, 22, 0, Math.PI * 2);
-            targetCtx.stroke();
-          });
-
-        } else if (layer.type === 'text') {
-          // Custom Neon Text Layer
-          const txt = layer.text || 'VICE NIGHTS';
-          targetCtx.textAlign = 'center';
-          targetCtx.textBaseline = 'middle';
-
-          if (layer.textStyle === 'neon_pink') {
-            targetCtx.font = '700 44px "Orbitron", sans-serif';
-            targetCtx.shadowColor = '#ff2a85';
-            targetCtx.shadowBlur = 22;
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.fillText(txt, 0, 0);
-            targetCtx.strokeStyle = '#ff2a85';
-            targetCtx.lineWidth = 2;
-            targetCtx.strokeText(txt, 0, 0);
-          } else if (layer.textStyle === 'neon_cyan') {
-            targetCtx.font = '700 44px "Orbitron", sans-serif';
-            targetCtx.shadowColor = '#00f0ff';
-            targetCtx.shadowBlur = 22;
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.fillText(txt, 0, 0);
-            targetCtx.strokeStyle = '#00f0ff';
-            targetCtx.lineWidth = 2;
-            targetCtx.strokeText(txt, 0, 0);
-          } else if (layer.textStyle === 'gold_stamp') {
-            targetCtx.font = '700 48px "Oswald", sans-serif';
-            targetCtx.lineWidth = 6;
-            targetCtx.strokeStyle = '#090512';
-            targetCtx.strokeText(txt, 0, 0);
-            targetCtx.fillStyle = '#ffb800';
-            targetCtx.fillText(txt, 0, 0);
-          } else {
-            targetCtx.font = '400 48px "Righteous", cursive';
-            targetCtx.shadowColor = '#ff2a85';
-            targetCtx.shadowBlur = 16;
-            targetCtx.fillStyle = '#00f0ff';
-            targetCtx.fillText(txt, 0, 0);
-          }
-        }
-
-        targetCtx.restore();
-      }
-
-      function drawStarShape(c, cx, cy, spikes, outerR, innerR, color) {
-        let rot = (Math.PI / 2) * 3;
-        let x = cx;
-        let y = cy;
-        const step = Math.PI / spikes;
-
-        c.save();
-        c.shadowColor = color;
-        c.shadowBlur = 12;
-        c.beginPath();
-        c.moveTo(cx, cy - outerR);
-        for (let i = 0; i < spikes; i++) {
-          x = cx + Math.cos(rot) * outerR;
-          y = cy + Math.sin(rot) * outerR;
-          c.lineTo(x, y);
-          rot += step;
-
-          x = cx + Math.cos(rot) * innerR;
-          y = cy + Math.sin(rot) * innerR;
-          c.lineTo(x, y);
-          rot += step;
-        }
-        c.lineTo(cx, cy - outerR);
-        c.closePath();
-        c.fillStyle = color;
-        c.fill();
-        c.restore();
-      }
-
-      // =========================================================================
-      // 8. CORE COMPOSITION RENDERER (USED FOR BOTH LIVE PREVIEW & 300 DPI EXPORT)
-      // =========================================================================
-      function renderScene(targetCtx, w, h, isExport = false) {
-        targetCtx.save();
-
-        // Deep dark print base
-        targetCtx.fillStyle = '#090512';
-        targetCtx.fillRect(0, 0, w, h);
-
-        // Render all layers in z-order
-        state.layers.forEach(layer => {
-          if (layer.type === 'photo') {
-            if (!photoBufferCanvas.width) return;
-            targetCtx.save();
-            targetCtx.translate(layer.x * w, layer.y * h);
-            targetCtx.rotate(layer.rotation);
-
-            // Scale photo relative to canvas width so preview and 300 DPI export match 1:1
-            const drawW = photoBufferCanvas.width * layer.scaleX * (w / 1000);
-            const drawH = photoBufferCanvas.height * layer.scaleY * (w / 1000);
-            targetCtx.drawImage(photoBufferCanvas, -drawW / 2, -drawH / 2, drawW, drawH);
-            targetCtx.restore();
-
-            // Apply Vignette & Scanlines over the photo layer before HUD/Frames
-            if (state.vignette > 0) {
-              const vigGrad = targetCtx.createRadialGradient(
-                w / 2, h / 2, Math.min(w, h) * 0.25,
-                w / 2, h / 2, Math.max(w, h) * 0.72
-              );
-              vigGrad.addColorStop(0, 'rgba(9, 5, 18, 0)');
-              vigGrad.addColorStop(1, `rgba(18, 4, 36, ${(state.vignette / 100) * 0.85})`);
-              targetCtx.fillStyle = vigGrad;
-              targetCtx.fillRect(0, 0, w, h);
-            }
-
-            if (state.scanlines) {
-              targetCtx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-              const step = Math.max(3, Math.round(h / 240));
-              for (let sy = 0; sy < h; sy += step * 2) {
-                targetCtx.fillRect(0, sy, w, step);
-              }
-            }
-          } else {
-            drawVectorElement(targetCtx, layer, w, h);
-          }
-        });
-
-        // Workspace-Only Guides (Bleed Margin & Selection Handles)
-        if (!isExport) {
-          // 0.25-inch Printify Safe-Zone Bleed Guide
-          if (state.showBleed) {
-            const spec = PRINT_SPECS[state.sizeKey];
-            const totalInchesW = state.orientation === 'portrait' ? spec.w / 300 : spec.h / 300;
-            const marginPx = (0.25 / totalInchesW) * w;
-
-            targetCtx.save();
-            targetCtx.strokeStyle = 'rgba(0, 240, 255, 0.65)';
-            targetCtx.lineWidth = 1.5;
-            targetCtx.setLineDash([6, 5]);
-            targetCtx.strokeRect(marginPx, marginPx, w - marginPx * 2, h - marginPx * 2);
-
-            targetCtx.fillStyle = 'rgba(0, 240, 255, 0.85)';
-            targetCtx.font = '700 10px "JetBrains Mono", monospace';
-            targetCtx.fillText('0.25" SAFE ZONE', marginPx + 6, marginPx + 13);
-            targetCtx.restore();
-          }
-
-          // Active Layer Bounding Box & Handles
-          const activeLayer = state.layers.find(l => l.id === state.selectedId);
-          if (activeLayer && !activeLayer.isFullFrame) {
-            drawSelectionGizmo(targetCtx, activeLayer, w, h);
-          }
-        }
-
-        targetCtx.restore();
-      }
-
-      // Compute screen-space dimensions of any selectable layer
-      function getLayerBoxMetrics(layer, canvasW, canvasH) {
-        if (layer.type === 'photo') {
-          const drawW = (photoBufferCanvas.width || 800) * layer.scaleX * (canvasW / 1000);
-          const drawH = (photoBufferCanvas.height || 800) * layer.scaleY * (canvasW / 1000);
-          return { cx: layer.x * canvasW, cy: layer.y * canvasH, w: drawW, h: drawH };
-        }
-        const unit = Math.min(canvasW, canvasH) / 600;
-        return {
-          cx: layer.x * canvasW,
-          cy: layer.y * canvasH,
-          w: layer.baseW * layer.scaleX * unit,
-          h: layer.baseH * layer.scaleY * unit
-        };
-      }
-
-      function drawSelectionGizmo(targetCtx, layer, w, h) {
-        const m = getLayerBoxMetrics(layer, w, h);
-        targetCtx.save();
-        targetCtx.translate(m.cx, m.cy);
-        targetCtx.rotate(layer.rotation);
-
-        // Dashed Cyan Selection Rectangle
-        targetCtx.strokeStyle = '#00f0ff';
-        targetCtx.lineWidth = 1.8;
-        targetCtx.setLineDash([5, 4]);
-        targetCtx.strokeRect(-m.w / 2, -m.h / 2, m.w, m.h);
-        targetCtx.setLineDash([]);
-
-        // Top Rotation Stem & Handle
-        targetCtx.beginPath();
-        targetCtx.moveTo(0, -m.h / 2);
-        targetCtx.lineTo(0, -m.h / 2 - 24);
-        targetCtx.strokeStyle = '#ff2a85';
-        targetCtx.lineWidth = 2;
-        targetCtx.stroke();
-
-        targetCtx.fillStyle = '#ff2a85';
-        targetCtx.beginPath();
-        targetCtx.arc(0, -m.h / 2 - 24, 7, 0, Math.PI * 2);
-        targetCtx.fill();
-        targetCtx.strokeStyle = '#ffffff';
-        targetCtx.lineWidth = 1.5;
-        targetCtx.stroke();
-
-        // 4 Corner Scale Handles
-        const corners = [
-          [-m.w / 2, -m.h / 2],
-          [m.w / 2, -m.h / 2],
-          [m.w / 2, m.h / 2],
-          [-m.w / 2, m.h / 2]
-        ];
-        corners.forEach(([cx, cy]) => {
-          targetCtx.fillStyle = '#00f0ff';
-          targetCtx.strokeStyle = '#090512';
-          targetCtx.lineWidth = 2;
-          targetCtx.fillRect(cx - 6, cy - 6, 12, 12);
-          targetCtx.strokeRect(cx - 6, cy - 6, 12, 12);
-        });
-
-        targetCtx.restore();
-      }
-
-      function redraw() {
-        renderScene(ctx, canvas.width, canvas.height, false);
-      }
-
-      // =========================================================================
-      // 9. RESPONSIVE CANVAS SIZING (MAINTAINING EXACT PRINTIFY ASPECT RATIO)
-      // =========================================================================
-      function resizeEditorCanvas() {
-        const target = getTargetPrintDimensions();
-        const aspect = target.width / target.height;
-
-        const stageRect = canvasStage.getBoundingClientRect();
-        const padW = 48;
-        const padH = 56;
-        const availW = Math.max(220, stageRect.width - padW);
-        const availH = Math.max(260, stageRect.height - padH);
-
-        let displayW = availW;
-        let displayH = displayW / aspect;
-
-        if (displayH > availH) {
-          displayH = availH;
-          displayW = displayH * aspect;
-        }
-
-        canvas.width = Math.round(displayW);
-        canvas.height = Math.round(displayH);
-        redraw();
-      }
-
-      window.addEventListener('resize', resizeEditorCanvas);
-
-      // =========================================================================
-      // 10. PHOTO FIT / FILL / RESET HELPERS
-      // =========================================================================
-      function fitBasePhoto(mode = 'fill') {
-        const photoLayer = state.layers.find(l => l.id === 'base_photo');
-        if (!photoLayer || !photoBufferCanvas.width) return;
-
-        const target = getTargetPrintDimensions();
-        const canvasAspect = target.width / target.height;
-        const imgAspect = photoBufferCanvas.width / photoBufferCanvas.height;
-
-        // Reference width in renderScene is w / 1000
-        let scale;
-        if (mode === 'fill') {
-          if (imgAspect > canvasAspect) {
-            // Image is wider than canvas -> match height
-            scale = (1000 / canvasAspect) / photoBufferCanvas.height;
-          } else {
-            // Image is taller than canvas -> match width
-            scale = 1000 / photoBufferCanvas.width;
-          }
-        } else {
-          // Fit completely inside
-          if (imgAspect > canvasAspect) {
-            scale = 1000 / photoBufferCanvas.width;
-          } else {
-            scale = (1000 / canvasAspect) / photoBufferCanvas.height;
-          }
-        }
-
-        photoLayer.x = 0.5;
-        photoLayer.y = 0.5;
-        photoLayer.scaleX = scale;
-        photoLayer.scaleY = scale;
-        photoLayer.rotation = 0;
-        redraw();
-      }
-
-      // =========================================================================
-      // 11. INTERACTIVE POINTER ENGINE (DRAG, CORNER SCALE, TOP ROTATE)
-      // =========================================================================
-      function getCanvasCoords(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return {
-          x: ((clientX - rect.left) / rect.width) * canvas.width,
-          y: ((clientY - rect.top) / rect.height) * canvas.height
-        };
-      }
-
-      function toLocalPoint(px, py, cx, cy, rotation) {
-        const dx = px - cx;
-        const dy = py - cy;
-        const cos = Math.cos(-rotation);
-        const sin = Math.sin(-rotation);
-        return {
-          x: dx * cos - dy * sin,
-          y: dx * sin + dy * cos
-        };
-      }
-
-      function handlePointerDown(e) {
-        if (e.cancelable) e.preventDefault();
-        const pt = getCanvasCoords(e);
-        const w = canvas.width;
-        const h = canvas.height;
-
-        // 1. First check handles of currently selected layer
-        const activeLayer = state.layers.find(l => l.id === state.selectedId);
-        if (activeLayer && !activeLayer.isFullFrame) {
-          const m = getLayerBoxMetrics(activeLayer, w, h);
-          const local = toLocalPoint(pt.x, pt.y, m.cx, m.cy, activeLayer.rotation);
-
-          // Check Rotation Handle (top center - 24px)
-          if (Math.hypot(local.x - 0, local.y - (-m.h / 2 - 24)) <= 16) {
-            state.interaction.mode = 'rotate';
-            state.interaction.origRotation = activeLayer.rotation;
-            state.interaction.startAngle = Math.atan2(pt.y - m.cy, pt.x - m.cx);
-            return;
-          }
-
-          // Check 4 Corner Scale Handles
-          const corners = [
-            [-m.w / 2, -m.h / 2],
-            [m.w / 2, -m.h / 2],
-            [m.w / 2, m.h / 2],
-            [-m.w / 2, m.h / 2]
-          ];
-          for (const [cx, cy] of corners) {
-            if (Math.abs(local.x - cx) <= 15 && Math.abs(local.y - cy) <= 15) {
-              state.interaction.mode = 'scale';
-              state.interaction.origScaleX = activeLayer.scaleX;
-              state.interaction.origScaleY = activeLayer.scaleY;
-              state.interaction.startDist = Math.max(10, Math.hypot(pt.x - m.cx, pt.y - m.cy));
-              return;
-            }
-          }
-        }
-
-        // 2. Hit-test layers from top to bottom (excluding full-frame borders unless selected via list)
-        let hitLayer = null;
-        for (let i = state.layers.length - 1; i >= 0; i--) {
-          const layer = state.layers[i];
-          if (layer.isFullFrame) continue;
-          const m = getLayerBoxMetrics(layer, w, h);
-          const local = toLocalPoint(pt.x, pt.y, m.cx, m.cy, layer.rotation);
-
-          if (Math.abs(local.x) <= m.w / 2 && Math.abs(local.y) <= m.h / 2) {
-            hitLayer = layer;
-            break;
-          }
-        }
-
-        if (hitLayer) {
-          selectLayer(hitLayer.id);
-          state.interaction.mode = 'move';
-          state.interaction.startX = pt.x;
-          state.interaction.startY = pt.y;
-          state.interaction.origX = hitLayer.x;
-          state.interaction.origY = hitLayer.y;
-        }
-      }
-
-      function handlePointerMove(e) {
-        if (!state.interaction.mode) return;
-        if (e.cancelable) e.preventDefault();
-
-        const pt = getCanvasCoords(e);
-        const w = canvas.width;
-        const h = canvas.height;
-        const activeLayer = state.layers.find(l => l.id === state.selectedId);
-        if (!activeLayer) return;
-
-        if (state.interaction.mode === 'move') {
-          const dx = (pt.x - state.interaction.startX) / w;
-          const dy = (pt.y - state.interaction.startY) / h;
-          activeLayer.x = state.interaction.origX + dx;
-          activeLayer.y = state.interaction.origY + dy;
-        } else if (state.interaction.mode === 'scale') {
-          const m = getLayerBoxMetrics(activeLayer, w, h);
-          const curDist = Math.max(10, Math.hypot(pt.x - m.cx, pt.y - m.cy));
-          const ratio = curDist / state.interaction.startDist;
-          activeLayer.scaleX = Math.max(0.15, Math.min(8, state.interaction.origScaleX * ratio));
-          activeLayer.scaleY = Math.max(0.15, Math.min(8, state.interaction.origScaleY * ratio));
-        } else if (state.interaction.mode === 'rotate') {
-          const m = getLayerBoxMetrics(activeLayer, w, h);
-          const curAngle = Math.atan2(pt.y - m.cy, pt.x - m.cx);
-          activeLayer.rotation = state.interaction.origRotation + (curAngle - state.interaction.startAngle);
-        }
-
-        redraw();
-      }
-
-      function handlePointerUp() {
-        state.interaction.mode = null;
-      }
-
-      canvas.addEventListener('mousedown', handlePointerDown);
-      window.addEventListener('mousemove', handlePointerMove);
-      window.addEventListener('mouseup', handlePointerUp);
-
-      canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
-      window.addEventListener('touchmove', handlePointerMove, { passive: false });
-      window.addEventListener('touchend', handlePointerUp);
-
-      // Keyboard Nudging & Deletion
-      window.addEventListener('keydown', (e) => {
-        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
-        const activeLayer = state.layers.find(l => l.id === state.selectedId);
-        if (!activeLayer) return;
-
-        if ((e.key === 'Delete' || e.key === 'Backspace') && activeLayer.id !== 'base_photo') {
-          e.preventDefault();
-          deleteSelectedLayer();
-        } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-          e.preventDefault();
-          const step = e.shiftKey ? 0.015 : 0.0025;
-          if (e.key === 'ArrowUp') activeLayer.y -= step;
-          if (e.key === 'ArrowDown') activeLayer.y += step;
-          if (e.key === 'ArrowLeft') activeLayer.x -= step;
-          if (e.key === 'ArrowRight') activeLayer.x += step;
-          redraw();
+          document.getElementById('status-msg').textContent = '';
+          document.getElementById('conf-order-id').textContent = orderId;
+          document.getElementById('order-confirmation').style.display = 'block';
+          cart = [];
+          updateCartUI();
+        } catch (err) {
+          document.getElementById('status-msg').textContent = 'Payment captured, but upload had a network hiccup. Contact us with PayPal ID: ' + details.id;
         }
       });
+    }
+  }).render('#paypal-button-container');
 
-      // =========================================================================
-      // 12. LAYER MANAGEMENT & ADDING ELEMENTS
-      // =========================================================================
-      function selectLayer(id) {
-        state.selectedId = id;
-        const layer = state.layers.find(l => l.id === id);
-        const badge = document.getElementById('selectedLayerBadge');
-        badge.textContent = layer ? layer.name : 'None';
-        redraw();
-      }
-
-      function addViceElement(subType) {
-        const elementDefs = {
-          frame_loading:   { name: 'Leonida Loading Grid', isFullFrame: true,  baseW: 500, baseH: 500, x: 0.5, y: 0.5 },
-          frame_postcard:  { name: 'Vice Postcard Border', isFullFrame: true,  baseW: 500, baseH: 500, x: 0.5, y: 0.5 },
-          frame_polaroid:  { name: 'Neon Sunset Polaroid', isFullFrame: true,  baseW: 500, baseH: 500, x: 0.5, y: 0.5 },
-          sticker_stars:   { name: '5-Star Wanted Level',  isFullFrame: false, baseW: 230, baseH: 54,  x: 0.72, y: 0.12 },
-          sticker_hud:     { name: 'Cash & Clock HUD',     isFullFrame: false, baseW: 280, baseH: 95,  x: 0.72, y: 0.24 },
-          sticker_passed:  { name: 'Vibe Passed Banner',   isFullFrame: false, baseW: 340, baseH: 86,  x: 0.5,  y: 0.84 },
-          sticker_sunpalms:{ name: 'Sunset & Palms',       isFullFrame: false, baseW: 190, baseH: 180, x: 0.25, y: 0.24 },
-          sticker_flamingo:{ name: 'Neon Flamingo Sign',   isFullFrame: false, baseW: 130, baseH: 180, x: 0.22, y: 0.74 },
-          sticker_car:     { name: '80s Turbo Wireframe',  isFullFrame: false, baseW: 260, baseH: 95,  x: 0.72, y: 0.76 }
-        };
-
-        const def = elementDefs[subType];
-        if (!def) return;
-
-        // If adding a full frame, replace any existing full frame so borders don't stack messily
-        if (def.isFullFrame) {
-          state.layers = state.layers.filter(l => !l.isFullFrame);
-        }
-
-        const newLayer = {
-          id: generateId(subType),
-          type: 'vector',
-          subType,
-          name: def.name,
-          isFullFrame: def.isFullFrame,
-          x: def.x,
-          y: def.y,
-          baseW: def.baseW,
-          baseH: def.baseH,
-          scaleX: 1,
-          scaleY: 1,
-          rotation: 0
-        };
-
-        state.layers.push(newLayer);
-        selectLayer(newLayer.id);
-        showToast(`Added: ${def.name}`, 'cyan');
-      }
-
-      function addCustomTextLayer() {
-        const input = document.getElementById('customTextInput');
-        const styleSel = document.getElementById('textStyleSelect');
-        const rawText = input.value.trim() || "VICE NIGHTS '86";
-
-        // Measure approximate width for clean bounding box
-        const estWidth = Math.max(180, rawText.length * 26);
-
-        const newLayer = {
-          id: generateId('text'),
-          type: 'text',
-          name: `Text: "${rawText.slice(0, 14)}"`,
-          text: rawText,
-          textStyle: styleSel.value,
-          isFullFrame: false,
-          x: 0.5,
-          y: 0.5,
-          baseW: estWidth,
-          baseH: 64,
-          scaleX: 1,
-          scaleY: 1,
-          rotation: 0
-        };
-
-        state.layers.push(newLayer);
-        selectLayer(newLayer.id);
-        input.value = '';
-        showToast('Neon text added to canvas', 'cyan');
-      }
-
-      function deleteSelectedLayer() {
-        if (state.selectedId === 'base_photo') {
-          showToast('Base photo cannot be deleted — upload a new one instead', 'pink');
-          return;
-        }
-        state.layers = state.layers.filter(l => l.id !== state.selectedId);
-        selectLayer('base_photo');
-        showToast('Layer removed', 'pink');
-      }
-
-      // =========================================================================
-      // 13. UI EVENT BINDINGS (SIZE, UPLOAD, FILTERS, TOOLBAR, CHECKOUT)
-      // =========================================================================
-      function updatePricingAndSpecUI() {
-        const spec = PRINT_SPECS[state.sizeKey];
-        const dims = getTargetPrintDimensions();
-        const orientLabel = state.orientation === 'portrait' ? 'Portrait' : 'Landscape';
-        const total = (spec.price * state.quantity).toFixed(2);
-
-        document.getElementById('headerSpecLabel').textContent = `${spec.label} (${orientLabel})`;
-        document.getElementById('headerResLabel').textContent = `${dims.width} × ${dims.height} px`;
-        document.getElementById('headerTotalPrice').textContent = `$${total}`;
-        document.getElementById('orientationText').textContent = orientLabel;
-      }
-
-      // Print Size Buttons
-      document.querySelectorAll('.size-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('btn-active-cyan'));
-          btn.classList.add('btn-active-cyan');
-          state.sizeKey = btn.dataset.size;
-          updatePricingAndSpecUI();
-          resizeEditorCanvas();
-        });
-      });
-
-      // Orientation Toggle
-      document.getElementById('toggleOrientationBtn').addEventListener('click', () => {
-        state.orientation = state.orientation === 'portrait' ? 'landscape' : 'portrait';
-        updatePricingAndSpecUI();
-        resizeEditorCanvas();
-      });
-
-      // Bleed Margin Toggle
-      document.getElementById('toggleBleedBtn').addEventListener('click', (e) => {
-        state.showBleed = !state.showBleed;
-        e.currentTarget.classList.toggle('btn-active-cyan', state.showBleed);
-        redraw();
-      });
-
-      // Quantity Controls
-      const qtyInput = document.getElementById('qtyInput');
-      function setQuantity(val) {
-        const clamped = Math.max(1, Math.min(25, parseInt(val, 10) || 1));
-        state.quantity = clamped;
-        qtyInput.value = clamped;
-        updatePricingAndSpecUI();
-      }
-      document.getElementById('qtyDecBtn').addEventListener('click', () => setQuantity(state.quantity - 1));
-      document.getElementById('qtyIncBtn').addEventListener('click', () => setQuantity(state.quantity + 1));
-      qtyInput.addEventListener('change', () => setQuantity(qtyInput.value));
-
-      // Strict JPG / PNG Photo Upload + Drag & Drop on Upload Box
-      function handleUploadedFile(file) {
-        if (!file) return;
-        const validTypes = ['image/jpeg', 'image/png'];
-        if (!validTypes.includes(file.type)) {
-          showToast('Invalid format! Please upload JPG or PNG only.', 'pink');
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const img = new Image();
-          img.onload = () => {
-            const photoLayer = state.layers.find(l => l.id === 'base_photo');
-            photoLayer.image = img;
-            document.getElementById('uploadedFileName').textContent = file.name;
-            rebuildFilteredPhotoBuffer(photoLayer);
-            fitBasePhoto('fill');
-            selectLayer('base_photo');
-            showToast(`Loaded "${file.name}"`, 'cyan');
-          };
-          img.src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-
-      const photoInput = document.getElementById('photoInput');
-      photoInput.addEventListener('change', (e) => handleUploadedFile(e.target.files[0]));
-
-      const dropZone = document.getElementById('dropZoneLabel');
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('border-[#00f0ff]');
-      });
-      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-[#00f0ff]'));
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('border-[#00f0ff]');
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-          handleUploadedFile(e.dataTransfer.files[0]);
-        }
-      });
-
-      // Photo Fit / Fill / Reset
-      document.getElementById('fitPhotoBtn').addEventListener('click', () => fitBasePhoto('fit'));
-      document.getElementById('fillPhotoBtn').addEventListener('click', () => fitBasePhoto('fill'));
-      document.getElementById('resetPhotoBtn').addEventListener('click', () => fitBasePhoto('fill'));
-
-      // Filter Presets & Sliders
-      function refreshPhotoFX() {
-        const photoLayer = state.layers.find(l => l.id === 'base_photo');
-        rebuildFilteredPhotoBuffer(photoLayer);
-        redraw();
-      }
-
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('btn-active-cyan'));
-          btn.classList.add('btn-active-cyan');
-          state.filterPreset = btn.dataset.filter;
-          refreshPhotoFX();
-        });
-      });
-
-      const sliderBindings = [
-        ['sliderBrightness', 'valBrightness', 'brightness', '%'],
-        ['sliderContrast',   'valContrast',   'contrast',   '%'],
-        ['sliderSaturation', 'valSaturation', 'saturation', '%'],
-        ['sliderVignette',   'valVignette',   'vignette',   '%']
-      ];
-      sliderBindings.forEach(([sliderId, labelId, stateKey, suffix]) => {
-        const el = document.getElementById(sliderId);
-        el.addEventListener('input', () => {
-          state[stateKey] = parseInt(el.value, 10);
-          document.getElementById(labelId).textContent = `${state[stateKey]}${suffix}`;
-          refreshPhotoFX();
-        });
-      });
-
-      document.getElementById('toggleScanlines').addEventListener('change', (e) => {
-        state.scanlines = e.target.checked;
-        redraw();
-      });
-
-      document.getElementById('resetFiltersBtn').addEventListener('click', () => {
-        state.filterPreset = 'original';
-        state.brightness = 100;
-        state.contrast = 100;
-        state.saturation = 100;
-        state.vignette = 20;
-        state.scanlines = false;
-
-        document.querySelectorAll('.filter-btn').forEach(b => {
-          b.classList.toggle('btn-active-cyan', b.dataset.filter === 'original');
-        });
-        document.getElementById('sliderBrightness').value = 100;
-        document.getElementById('valBrightness').textContent = '100%';
-        document.getElementById('sliderContrast').value = 100;
-        document.getElementById('valContrast').textContent = '100%';
-        document.getElementById('sliderSaturation').value = 100;
-        document.getElementById('valSaturation').textContent = '100%';
-        document.getElementById('sliderVignette').value = 20;
-        document.getElementById('valVignette').textContent = '20%';
-        document.getElementById('toggleScanlines').checked = false;
-        refreshPhotoFX();
-      });
-
-      // Add Vector Elements & Custom Text
-      document.querySelectorAll('.add-el-btn').forEach(btn => {
-        btn.addEventListener('click', () => addViceElement(btn.dataset.addElement));
-      });
-      document.getElementById('addTextBtn').addEventListener('click', addCustomTextLayer);
-      document.getElementById('customTextInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') addCustomTextLayer();
-      });
-
-      // Layer Ordering & Management Buttons
-      document.getElementById('layerUpBtn').addEventListener('click', () => {
-        const idx = state.layers.findIndex(l => l.id === state.selectedId);
-        if (idx > 0 && idx < state.layers.length - 1) {
-          [state.layers[idx], state.layers[idx + 1]] = [state.layers[idx + 1], state.layers[idx]];
-          redraw();
-        }
-      });
-
-      document.getElementById('layerDownBtn').addEventListener('click', () => {
-        const idx = state.layers.findIndex(l => l.id === state.selectedId);
-        // Keep index 0 reserved for base_photo
-        if (idx > 1) {
-          [state.layers[idx], state.layers[idx - 1]] = [state.layers[idx - 1], state.layers[idx]];
-          redraw();
-        }
-      });
-
-      document.getElementById('duplicateBtn').addEventListener('click', () => {
-        const src = state.layers.find(l => l.id === state.selectedId);
-        if (!src || src.id === 'base_photo' || src.isFullFrame) {
-          showToast('Select a sticker or text layer to duplicate', 'pink');
-          return;
-        }
-        const clone = {
-          ...src,
-          id: generateId('clone'),
-          x: Math.min(0.92, src.x + 0.04),
-          y: Math.min(0.92, src.y + 0.04)
-        };
-        state.layers.push(clone);
-        selectLayer(clone.id);
-      });
-
-      document.getElementById('deleteBtn').addEventListener('click', deleteSelectedLayer);
-
-      document.getElementById('clearStickersBtn').addEventListener('click', () => {
-        state.layers = state.layers.filter(l => l.id === 'base_photo');
-        selectLayer('base_photo');
-        showToast('All frames & stickers cleared', 'cyan');
-      });
-
-      // =========================================================================
-      // 14. HIGH-RES 300 DPI OFF-SCREEN EXPORT & CHECKOUT MODAL
-      // =========================================================================
-      const checkoutModal = document.getElementById('checkoutModal');
-
-      document.getElementById('openCheckoutBtn').addEventListener('click', () => {
-        const spec = PRINT_SPECS[state.sizeKey];
-        const dims = getTargetPrintDimensions();
-        const total = (spec.price * state.quantity).toFixed(2);
-
-        document.getElementById('modalProductSize').textContent = spec.label;
-        document.getElementById('modalOrientation').textContent = state.orientation === 'portrait' ? 'Portrait' : 'Landscape';
-        document.getElementById('modalResolution').textContent = `${dims.width} × ${dims.height} px`;
-        document.getElementById('modalFilterUsed').textContent = FILTER_NAMES[state.filterPreset];
-        document.getElementById('modalQty').textContent = state.quantity;
-        document.getElementById('modalTotal').textContent = `$${total} USD`;
-
-        const spinner = document.getElementById('proofSpinner');
-        const proofImg = document.getElementById('proofPreviewImg');
-        spinner.classList.remove('hidden');
-        proofImg.classList.add('hidden');
-
-        checkoutModal.classList.remove('hidden');
-        checkoutModal.classList.add('flex');
-
-        // Render full 300 DPI master canvas asynchronously so UI opens smoothly
-        setTimeout(() => {
-          const exportCanvas = document.createElement('canvas');
-          exportCanvas.width = dims.width;
-          exportCanvas.height = dims.height;
-          const exportCtx = exportCanvas.getContext('2d');
-
-          renderScene(exportCtx, dims.width, dims.height, true);
-
-          const dataUrl = exportCanvas.toDataURL('image/png');
-          state.lastProofDataUrl = dataUrl;
-          proofImg.src = dataUrl;
-          spinner.classList.add('hidden');
-          proofImg.classList.remove('hidden');
-        }, 60);
-      });
-
-      document.getElementById('closeModalBtn').addEventListener('click', () => {
-        checkoutModal.classList.add('hidden');
-        checkoutModal.classList.remove('flex');
-      });
-
-      // Download 300 DPI Proof PNG for local testing
-      document.getElementById('downloadProofBtn').addEventListener('click', () => {
-        if (!state.lastProofDataUrl) return;
-        const dims = getTargetPrintDimensions();
-        const link = document.createElement('a');
-        link.download = `PrintShop_${state.sizeKey}_${dims.width}x${dims.height}_300DPI.png`;
-        link.href = state.lastProofDataUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast('300 DPI PNG downloaded!', 'cyan');
-      });
-
-      // Step 2 Integration Hook
-      document.getElementById('paypalHookBtn').addEventListener('click', () => {
-        showToast('Ready for Step 2: PayPal SDK + Google Drive Apps Script!', 'cyan');
-      });
-
-      // =========================================================================
-      // 15. INITIALIZE STUDIO
-      // =========================================================================
-      function init() {
-        const demoImg = createDefaultDemoImage();
-        demoImg.onload = () => {
-          const basePhotoLayer = {
-            id: 'base_photo',
-            type: 'photo',
-            name: 'Base Photo',
-            image: demoImg,
-            isFullFrame: false,
-            x: 0.5,
-            y: 0.5,
-            scaleX: 1,
-            scaleY: 1,
-            rotation: 0
-          };
-          state.layers = [basePhotoLayer];
-          rebuildFilteredPhotoBuffer(basePhotoLayer);
-          updatePricingAndSpecUI();
-          resizeEditorCanvas();
-          fitBasePhoto('fill');
-        };
-      }
-
-      init();
-    })();
-  </script>
+  renderCanvas();
+</script>
 </body>
 </html>
