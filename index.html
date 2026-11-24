@@ -3,486 +3,1249 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PrintShop | OllyIsAFish</title>
-  <!-- Replace YOUR_PAYPAL_CLIENT_ID with your live or sandbox PayPal Client ID -->
-  <script src="https://www.paypal.com/sdk/js?currency=USD&client-id=BAA40StwGiqW8zUc_WjTtH4QiXCFjdqd-BpXmdJYwU1WCpdkaZiCNl1sy0-IU0U-N51EihgabLR-7reF_Q"></script>
+  <title>PrintShop Kiosk | OllyIsAFish</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+  <!-- Replace YOUR_PAYPAL_CLIENT_ID with your live PayPal Client ID -->
+  <script src="https://www.paypal.com/sdk/js?currency=USD&client-id=BAA40StwGiqW8zUc_WjTtH4QiXCFjdqd-BpXmdJYwU1WCpdkaZiCNl1sy0-IU0U-N51EihgabLR-7reF_Q""></script>
   <style>
     :root {
-      --bg: #f4f1ea;
-      --panel: #ffffff;
-      --ink: #1e1e1e;
-      --accent: #d95d39;
-      --border: #2b2b2b;
-      --mono: 'JetBrains Mono', 'Courier New', monospace;
+      --bg-canvas: #05001F;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-400: #94a3b8;
+      --text-main: #e2e8f0;
+      --text-white: #ffffff;
+      --blue-400: #60a5fa;
+      --blue-600: #3b82f6;
+      --blue-500: #2563eb;
+      --navy-banner: rgba(30, 58, 138, 0.4);
+      --navy-border: rgba(30, 64, 175, 0.5);
+      --emerald-400: #34d399;
+      --emerald-600: #059669;
+      --red-500: #ef4444;
+      --red-600: #dc2626;
+      --font-mono: 'JetBrains Mono', monospace;
     }
+
     * { box-sizing: border-box; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-canvas); }
+    ::-webkit-scrollbar-thumb { background: var(--blue-600); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--blue-400); }
+
     body {
       margin: 0;
-      font-family: var(--mono);
-      background: var(--bg);
-      color: var(--ink);
-      padding: 20px;
+      font-family: var(--font-mono);
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
     }
+
+    /* Watermark */
+    .watermark {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      width: 110px;
+      height: auto;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Free Shipping Top Banner */
+    .shipping-banner {
+      background: var(--navy-banner);
+      border-bottom: 1px solid var(--navy-border);
+      color: var(--blue-400);
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Sticky Kiosk Header */
     header {
-      max-width: 1100px;
-      margin: 0 auto 20px;
-      border-bottom: 3px solid var(--border);
-      padding-bottom: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--slate-900);
+      border-bottom: 1px solid var(--navy-border);
+      padding: 12px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
-    h1 { margin: 0; font-size: 1.5rem; letter-spacing: -0.5px; }
-    .grid {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 20px;
-    }
-    @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } }
-    .card {
-      background: var(--panel);
-      border: 2px solid var(--border);
-      box-shadow: 4px 4px 0 var(--border);
-      padding: 18px;
-    }
-    .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
-    .tab {
-      flex: 1;
-      padding: 10px;
-      border: 2px solid var(--border);
-      background: #e8e4da;
-      font-family: var(--mono);
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .tab.active { background: var(--accent); color: #fff; }
-    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-    label { display: block; font-size: 0.78rem; font-weight: bold; margin-bottom: 4px; }
-    select, input[type="number"], input[type="range"], input[type="file"], button {
-      width: 100%;
-      padding: 8px;
-      border: 2px solid var(--border);
-      font-family: var(--mono);
-      background: #fff;
-    }
-    button.primary {
-      background: var(--ink);
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 15px;
-      padding: 12px;
-    }
-    button.primary:hover { background: var(--accent); }
-    .canvas-wrap {
-      margin-top: 15px;
-      background: #dcd8ce;
-      border: 2px dashed var(--border);
+
+    .brand {
       display: flex;
-      justify-content: center;
       align-items: center;
-      min-height: 300px;
-      padding: 10px;
+      gap: 12px;
+    }
+    .brand img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--blue-400);
+      margin: 0;
+    }
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--slate-400);
+      display: block;
+    }
+
+    /* Kiosk Step Pills */
+    .kiosk-steps {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .step-pill {
+      background: var(--slate-800);
+      border: 1px solid var(--slate-700);
+      color: var(--slate-400);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .step-pill.active {
+      border-color: var(--blue-600);
+      color: var(--text-white);
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    /* Cart Trigger Button */
+    .cart-trigger {
+      position: relative;
+      background: var(--slate-800);
+      border: 1px solid var(--slate-700);
+      color: var(--text-white);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.15s;
+    }
+    .cart-trigger:hover {
+      border-color: var(--blue-400);
+      background: var(--slate-700);
+    }
+    .cart-badge {
+      background: var(--red-600);
+      color: var(--text-white);
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    /* Main Kiosk Workspace */
+    .kiosk-container {
+      max-width: 1280px;
+      width: 100%;
+      margin: 20px auto;
+      padding: 0 20px 60px;
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 960px) {
+      .kiosk-container { grid-template-columns: 1fr; }
+      .kiosk-steps { display: none; }
+    }
+
+    .panel {
+      background: var(--slate-900);
+      border: 1px solid var(--slate-700);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--slate-700);
+    }
+    .panel-title {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-white);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .sku-tag {
+      font-size: 0.72rem;
+      color: var(--slate-400);
+    }
+
+    /* Service Mode Cards (Walmart/CVS Kiosk Style) */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .mode-card {
+      background: var(--slate-800);
+      border: 2px solid var(--slate-700);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      transition: 0.15s;
+    }
+    .mode-card:hover { border-color: var(--blue-400); }
+    .mode-card.active {
+      border-color: var(--blue-600);
+      background: rgba(59, 130, 246, 0.14);
+    }
+    .mode-card strong {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+    .mode-card span {
+      font-size: 0.74rem;
+      color: var(--slate-400);
+    }
+
+    /* Upload Dropzone */
+    .upload-zone {
+      border: 2px dashed var(--slate-700);
+      background: var(--slate-800);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.15s;
+      margin-bottom: 16px;
+    }
+    .upload-zone:hover {
+      border-color: var(--blue-400);
+      background: rgba(30, 41, 59, 0.8);
+    }
+    .upload-zone input { display: none; }
+    .upload-btn-label {
+      display: inline-block;
+      background: var(--blue-600);
+      color: var(--text-white);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 8px 16px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+    .upload-hint {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--slate-400);
+    }
+
+    /* Darkroom Canvas Stage */
+    .canvas-stage {
+      background: #02010a;
+      border: 1px solid var(--slate-700);
+      border-radius: 10px;
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      position: relative;
       overflow: hidden;
     }
     canvas {
       max-width: 100%;
-      max-height: 360px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      background: #fff;
+      max-height: 380px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.85);
+      cursor: grab;
+      border: 1px solid var(--slate-700);
     }
-    .cart-item {
-      border-bottom: 1px solid #ccc;
-      padding: 10px 0;
+    canvas:active { cursor: grabbing; }
+    .canvas-tip {
+      margin-top: 10px;
+      font-size: 0.72rem;
+      color: var(--slate-400);
+    }
+
+    /* Kiosk Toolbar Sliders & Buttons */
+    .editor-toolbar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+      background: var(--slate-800);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--slate-700);
+    }
+    @media (max-width: 600px) { .editor-toolbar { grid-template-columns: 1fr; } }
+
+    .tool-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--slate-400);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue-600);
+      cursor: pointer;
+    }
+    .tool-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .chip-btn {
+      background: var(--slate-800);
+      border: 1px solid var(--slate-700);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 7px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .chip-btn:hover { border-color: var(--blue-400); color: var(--text-white); }
+    .chip-btn.active {
+      background: var(--blue-600);
+      border-color: var(--blue-400);
+      color: var(--text-white);
+    }
+
+    /* Right Column: Size Tiles & Options */
+    .size-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .size-tile {
+      background: var(--slate-800);
+      border: 2px solid var(--slate-700);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
-      font-size: 0.85rem;
+      transition: 0.15s;
     }
-    .cart-item img { width: 48px; height: 48px; object-fit: cover; border: 1px solid var(--border); }
-    .remove-btn {
-      width: auto;
+    .size-tile:hover { border-color: var(--blue-400); }
+    .size-tile.active {
+      border-color: var(--blue-600);
+      background: rgba(59, 130, 246, 0.15);
+    }
+    .size-name {
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: var(--text-white);
+    }
+    .size-dim {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--slate-400);
+    }
+    .price-badge {
+      background: var(--navy-banner);
+      border: 1px solid var(--navy-border);
+      color: var(--blue-400);
+      font-weight: 800;
+      font-size: 0.8rem;
       padding: 4px 8px;
-      background: #ffeded;
-      color: #b00;
-      cursor: pointer;
-      font-size: 0.75rem;
+      border-radius: 6px;
     }
-    .total-bar {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin: 15px 0;
-      padding-top: 10px;
-      border-top: 2px solid var(--border);
+
+    .option-block { margin-bottom: 16px; }
+    .option-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--slate-400);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    /* Swatch Buttons for Document Paper Color */
+    .swatch-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .swatch-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--slate-800);
+      border: 2px solid var(--slate-700);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .swatch-btn.active { border-color: var(--blue-600); color: var(--text-white); }
+    .swatch-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid #475569;
+    }
+
+    /* Quantity Stepper */
+    .qty-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--slate-800);
+      border: 1px solid var(--slate-700);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .stepper { display: flex; align-items: center; gap: 10px; }
+    .step-btn {
+      width: 34px;
+      height: 34px;
+      background: var(--slate-900);
+      border: 1px solid var(--slate-700);
+      color: var(--text-white);
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 800;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .step-btn:hover { border-color: var(--blue-400); }
+    .qty-val {
+      font-size: 1.05rem;
+      font-weight: 800;
+      min-width: 28px;
+      text-align: center;
+      color: var(--text-white);
+    }
+
+    /* Primary CTA Button */
+    .cta-btn {
+      width: 100%;
+      background: var(--blue-600);
+      color: var(--text-white);
+      border: none;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.15s;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
-    #order-confirmation {
+    .cta-btn:hover { background: var(--blue-500); }
+
+    /* Slide-Over Cart Drawer */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 0, 31, 0.78);
+      backdrop-filter: blur(3px);
+      z-index: 50;
       display: none;
-      background: #e6f7ec;
-      border: 2px solid #1b7a3d;
-      padding: 15px;
-      margin-top: 15px;
     }
-    .hidden { display: none; }
+    .drawer-backdrop.open { display: block; }
+
+    .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: -460px;
+      width: 100%;
+      max-width: 440px;
+      height: 100vh;
+      background: var(--slate-900);
+      border-left: 1px solid var(--slate-700);
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      transition: right 0.25s ease;
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.7);
+    }
+    .cart-drawer.open { right: 0; }
+
+    .drawer-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--slate-700);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .close-drawer {
+      background: var(--slate-800);
+      border: 1px solid var(--slate-700);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+    }
+    .cart-card {
+      background: var(--slate-800);
+      border: 1px solid var(--slate-700);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .cart-card img {
+      width: 56px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid var(--slate-700);
+      background: #000;
+    }
+    .cart-info { flex: 1; font-size: 0.78rem; }
+    .cart-info strong { color: var(--text-white); font-size: 0.84rem; }
+    .cart-del {
+      background: rgba(220, 38, 38, 0.15);
+      border: 1px solid var(--red-600);
+      color: var(--red-500);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 5px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .drawer-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--slate-700);
+      background: var(--slate-900);
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+      color: var(--slate-400);
+    }
+    .summary-row.free { color: var(--emerald-400); font-weight: 700; }
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-white);
+      padding-top: 8px;
+      margin-top: 8px;
+      border-top: 1px solid var(--slate-700);
+      margin-bottom: 14px;
+    }
+
+    /* Confirmation Box */
+    .order-success {
+      display: none;
+      background: rgba(5, 150, 105, 0.15);
+      border: 1px solid var(--emerald-600);
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+    }
+    .order-success strong { color: var(--emerald-400); font-size: 0.92rem; }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--emerald-600);
+      color: var(--text-white);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 10px 18px;
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      z-index: 100;
+      transition: transform 0.25s ease;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: var(--red-600); }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>PRINTSHOP // OLLYISAFISH</h1>
-  <span>300 DPI CUSTOM PRINTS</span>
-</header>
+  <!-- Watermark -->
+  <img src="logo.png" alt="" class="watermark" onerror="this.style.display='none'" />
 
-<div class="grid">
-  <!-- LEFT: EDITOR & CONFIGURATOR -->
-  <div class="card">
-    <div class="tabs">
-      <button class="tab active" id="tab-photo" onclick="setMode('photo')">PHOTO PRINT</button>
-      <button class="tab" id="tab-doc" onclick="setMode('doc')">DOCUMENT PRINT</button>
-    </div>
-
-    <label for="fileInput">1. UPLOAD IMAGE (PNG, JPG, WEBP)</label>
-    <input type="file" id="fileInput" accept="image/*" />
-
-    <!-- PHOTO CONTROLS -->
-    <div id="photo-controls" class="controls">
-      <div>
-        <label>PRINT SIZE</label>
-        <select id="photoSize" onchange="renderCanvas()">
-          <option value="4x6" data-w="1200" data-h="1800" data-price="1.50">4" x 6" ($1.50)</option>
-          <option value="5x7" data-w="1500" data-h="2100" data-price="3.00">5" x 7" ($3.00)</option>
-          <option value="8x10" data-w="2400" data-h="3000" data-price="6.50">8" x 10" ($6.50)</option>
-          <option value="11x14" data-w="3300" data-h="4200" data-price="12.00">11" x 14" ($12.00)</option>
-        </select>
-      </div>
-      <div>
-        <label>FINISH</label>
-        <select id="photoFinish" onchange="renderCanvas()">
-          <option value="Glossy">Glossy</option>
-          <option value="Matte">Matte</option>
-        </select>
-      </div>
-      <div>
-        <label>BRIGHTNESS (<span id="brightVal">100</span>%)</label>
-        <input type="range" id="brightness" min="50" max="150" value="100" oninput="renderCanvas()" />
-      </div>
-      <div>
-        <label>CONTRAST (<span id="contrastVal">100</span>%)</label>
-        <input type="range" id="contrast" min="50" max="150" value="100" oninput="renderCanvas()" />
-      </div>
-      <div>
-        <label>FILTER</label>
-        <select id="photoFilter" onchange="renderCanvas()">
-          <option value="none">Original Color</option>
-          <option value="grayscale(100%)">Black & White</option>
-          <option value="sepia(80%)">Warm Vintage</option>
-        </select>
-      </div>
-      <div>
-        <label>ORIENTATION</label>
-        <button type="button" onclick="toggleOrientation()">Rotate 90°</button>
-      </div>
-    </div>
-
-    <!-- DOCUMENT CONTROLS -->
-    <div id="doc-controls" class="controls hidden">
-      <div>
-        <label>PAPER SIZE</label>
-        <select id="docSize" onchange="renderCanvas()">
-          <option value="8.5x11" data-w="2550" data-h="3300" data-price="0.75">8.5" x 11" Letter ($0.75)</option>
-          <option value="11x17" data-w="3300" data-h="5100" data-price="1.75">11" x 17" Tabloid ($1.75)</option>
-        </select>
-      </div>
-      <div>
-        <label>PAPER TYPE</label>
-        <select id="docStock" onchange="renderCanvas()">
-          <option value="Standard_20lb" data-add="0">Standard 20lb (+$0.00)</option>
-          <option value="Cardstock_80lb" data-add="0.75">Heavy Cardstock 80lb (+$0.75)</option>
-          <option value="Glossy_Flyer" data-add="1.00">Glossy Presentation (+$1.00)</option>
-        </select>
-      </div>
-      <div>
-        <label>PAPER COLOR</label>
-        <select id="docColor" onchange="renderCanvas()">
-          <option value="#ffffff" data-name="White">Bright White</option>
-          <option value="#f7f3e3" data-name="Cream">Warm Cream</option>
-          <option value="#d9edf7" data-name="PastelBlue">Pastel Blue</option>
-          <option value="#fcf8e3" data-name="PastelYellow">Canary Yellow</option>
-          <option value="#f2dede" data-name="PastelPink">Soft Pink</option>
-        </select>
-      </div>
-      <div>
-        <label>FIT MODE</label>
-        <select id="docFit" onchange="renderCanvas()">
-          <option value="contain">Fit Whole Page (Margins)</option>
-          <option value="cover">Full Bleed Fill</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="controls">
-      <div>
-        <label>QUANTITY</label>
-        <input type="number" id="qty" value="1" min="1" max="100" />
-      </div>
-      <div style="display:flex; align-items:flex-end;">
-        <button type="button" class="primary" style="margin-top:0;" onclick="addToCart()">+ ADD TO CART</button>
-      </div>
-    </div>
-
-    <div class="canvas-wrap">
-      <canvas id="editorCanvas" width="1200" height="1800"></canvas>
-    </div>
+  <!-- Top Shipping Promo Bar -->
+  <div class="shipping-banner">
+    Free Shipping on orders over $35.00 • Flat $6.95 shipping under $35
   </div>
 
-  <!-- RIGHT: CART & PAYPAL CHECKOUT -->
-  <div class="card">
-    <h2 style="margin-top:0;">YOUR CART (<span id="cartCount">0</span>)</h2>
-    <div id="cartList">
-      <p style="color:#666; font-size:0.85rem;">No prints added yet.</p>
+  <!-- Sticky Kiosk Header -->
+  <header>
+    <div class="brand">
+      <img src="logo.png" alt="Logo" onerror="this.style.display='none'" />
+      <div>
+        <h1 class="brand-title">PRINTSHOP KIOSK</h1>
+        <span class="brand-sub">PrintShop.ollyisafish.com • 300 DPI Lab</span>
+      </div>
     </div>
 
-    <div class="total-bar">
-      <span>TOTAL:</span>
-      <span>$<span id="cartTotal">0.00</span></span>
+    <div class="kiosk-steps">
+      <div class="step-pill active">1. UPLOAD & EDIT</div>
+      <div class="step-pill active">2. PAPER & SIZE</div>
+      <div class="step-pill">3. CHECKOUT</div>
     </div>
 
-    <div id="paypal-button-container"></div>
-    <div id="status-msg" style="font-size:0.85rem; margin-top:10px; font-weight:bold;"></div>
+    <button class="cart-trigger" onclick="toggleDrawer(true)">
+      <span>PRINT QUEUE</span>
+      <span class="cart-badge" id="headerBadge">0</span>
+    </button>
+  </header>
 
-    <div id="order-confirmation">
-      <strong>ORDER CONFIRMED!</strong><br>
-      Order Number: <span id="conf-order-id" style="font-size:1.1rem;"></span><br>
-      <small>Your high-res print files have been sent to the print queue. Save your order number for reference.</small>
+  <!-- Main Kiosk Grid -->
+  <main class="kiosk-container">
+
+    <!-- LEFT PANEL: UPLOAD & CANVAS STUDIO -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Step 1: Upload & Edit Canvas</h2>
+        <span class="sku-tag" id="canvasDimLabel">1200 × 1800 PX (300 DPI)</span>
+      </div>
+
+      <!-- Kiosk Service Selector -->
+      <div class="mode-grid">
+        <button type="button" class="mode-card active" id="modePhotoBtn" onclick="setMode('photo')">
+          <strong>PHOTO PRINTS</strong>
+          <span>Glossy or Matte Photo Paper</span>
+        </button>
+        <button type="button" class="mode-card" id="modeDocBtn" onclick="setMode('doc')">
+          <strong>DOCUMENT PRINTS</strong>
+          <span>Standard, Cardstock & Colored Paper</span>
+        </button>
+      </div>
+
+      <!-- Touch Upload Zone -->
+      <label class="upload-zone" for="fileInput">
+        <input type="file" id="fileInput" accept="image/*" />
+        <span class="upload-btn-label">+ SELECT FILE FROM DEVICE</span>
+        <span class="upload-hint" id="fileNameDisplay">Supports high-res PNG, JPG, WEBP</span>
+      </label>
+
+      <!-- Darkroom Preview Canvas -->
+      <div class="canvas-stage">
+        <canvas id="editorCanvas" width="1200" height="1800"></canvas>
+        <div class="canvas-tip">TIP: Drag image inside frame to adjust crop position</div>
+      </div>
+
+      <!-- Photo / Canvas Adjustment Controls -->
+      <div class="editor-toolbar">
+        <div class="tool-group">
+          <label><span>ZOOM / CROP</span><span id="zoomVal">100%</span></label>
+          <input type="range" id="zoomRange" min="50" max="220" value="100" oninput="renderCanvas()" />
+        </div>
+        <div class="tool-group">
+          <label><span>BRIGHTNESS</span><span id="brightVal">100%</span></label>
+          <input type="range" id="brightRange" min="60" max="150" value="100" oninput="renderCanvas()" />
+        </div>
+        <div class="tool-group">
+          <label><span>CONTRAST</span><span id="contrastVal">100%</span></label>
+          <input type="range" id="contrastRange" min="60" max="150" value="100" oninput="renderCanvas()" />
+        </div>
+      </div>
+
+      <div class="tool-actions">
+        <button type="button" class="chip-btn" onclick="rotateCanvas()">↻ ROTATE 90°</button>
+        <button type="button" class="chip-btn" onclick="resetAdjustments()">↺ RESET CROP</button>
+        <button type="button" class="chip-btn active" id="flt-none" onclick="setFilter('none', this)">ORIGINAL</button>
+        <button type="button" class="chip-btn" id="flt-bw" onclick="setFilter('grayscale(100%)', this)">B&W</button>
+        <button type="button" class="chip-btn" id="flt-vintage" onclick="setFilter('sepia(65%) contrast(108%)', this)">VINTAGE</button>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: PRINT SPECS & ADD TO CART -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Step 2: Print Specifications</h2>
+        <span class="sku-tag" id="activeSku">SKU: PHOTO-4X6</span>
+      </div>
+
+      <!-- PHOTO OPTIONS -->
+      <div id="photoOptions">
+        <span class="option-label">Select Photo Size</span>
+        <div class="size-grid" id="photoSizeGrid">
+          <div class="size-tile active" data-size="4x6" data-w="1200" data-h="1800" data-price="1.50" onclick="selectSize(this, 'photo')">
+            <div><span class="size-name">4" × 6"</span><span class="size-dim">Wallet / Standard</span></div>
+            <span class="price-badge">$1.50</span>
+          </div>
+          <div class="size-tile" data-size="5x7" data-w="1500" data-h="2100" data-price="3.00" onclick="selectSize(this, 'photo')">
+            <div><span class="size-name">5" × 7"</span><span class="size-dim">Frame Ready</span></div>
+            <span class="price-badge">$3.00</span>
+          </div>
+          <div class="size-tile" data-size="8x10" data-w="2400" data-h="3000" data-price="6.50" onclick="selectSize(this, 'photo')">
+            <div><span class="size-name">8" × 10"</span><span class="size-dim">Portrait Large</span></div>
+            <span class="price-badge">$6.50</span>
+          </div>
+          <div class="size-tile" data-size="11x14" data-w="3300" data-h="4200" data-price="12.00" onclick="selectSize(this, 'photo')">
+            <div><span class="size-name">11" × 14"</span><span class="size-dim">Poster Print</span></div>
+            <span class="price-badge">$12.00</span>
+          </div>
+        </div>
+
+        <div class="option-block">
+          <span class="option-label">Paper Finish</span>
+          <div class="tool-actions">
+            <button type="button" class="chip-btn active" onclick="selectChip('photoFinish', 'Glossy', this)">GLOSSY FINISH</button>
+            <button type="button" class="chip-btn" onclick="selectChip('photoFinish', 'Matte', this)">MATTE FINISH</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENT OPTIONS -->
+      <div id="docOptions" class="hidden">
+        <span class="option-label">Select Document Size</span>
+        <div class="size-grid" id="docSizeGrid">
+          <div class="size-tile active" data-size="8.5x11" data-w="2550" data-h="3300" data-price="0.75" onclick="selectSize(this, 'doc')">
+            <div><span class="size-name">8.5" × 11"</span><span class="size-dim">US Letter</span></div>
+            <span class="price-badge">$0.75</span>
+          </div>
+          <div class="size-tile" data-size="11x17" data-w="3300" data-h="5100" data-price="1.75" onclick="selectSize(this, 'doc')">
+            <div><span class="size-name">11" × 17"</span><span class="size-dim">Tabloid / Ledger</span></div>
+            <span class="price-badge">$1.75</span>
+          </div>
+        </div>
+
+        <div class="option-block">
+          <span class="option-label">Paper Stock & Weight</span>
+          <div class="tool-actions">
+            <button type="button" class="chip-btn active" data-add="0" onclick="selectStock('Standard_20lb', 0, this)">20LB BOND (+$0.00)</button>
+            <button type="button" class="chip-btn" data-add="0.75" onclick="selectStock('Cardstock_80lb', 0.75, this)">80LB CARDSTOCK (+$0.75)</button>
+            <button type="button" class="chip-btn" data-add="1.00" onclick="selectStock('Glossy_Laser', 1.00, this)">GLOSSY FLYER (+$1.00)</button>
+          </div>
+        </div>
+
+        <div class="option-block">
+          <span class="option-label">Paper Tint / Color</span>
+          <div class="swatch-row">
+            <button type="button" class="swatch-btn active" onclick="selectPaperColor('#ffffff', 'White', this)">
+              <span class="swatch-dot" style="background:#ffffff;"></span>White
+            </button>
+            <button type="button" class="swatch-btn" onclick="selectPaperColor('#f7f3e3', 'Cream', this)">
+              <span class="swatch-dot" style="background:#f7f3e3;"></span>Cream
+            </button>
+            <button type="button" class="swatch-btn" onclick="selectPaperColor('#dbeafe', 'PastelBlue', this)">
+              <span class="swatch-dot" style="background:#dbeafe;"></span>Blue
+            </button>
+            <button type="button" class="swatch-btn" onclick="selectPaperColor('#fef9c3', 'CanaryYellow', this)">
+              <span class="swatch-dot" style="background:#fef9c3;"></span>Yellow
+            </button>
+            <button type="button" class="swatch-btn" onclick="selectPaperColor('#fce7f3', 'SoftPink', this)">
+              <span class="swatch-dot" style="background:#fce7f3;"></span>Pink
+            </button>
+          </div>
+        </div>
+
+        <div class="option-block">
+          <span class="option-label">Page Margins</span>
+          <div class="tool-actions">
+            <button type="button" class="chip-btn active" onclick="selectFit('contain', this)">FIT WITH MARGINS</button>
+            <button type="button" class="chip-btn" onclick="selectFit('cover', this)">FULL BLEED</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quantity Selector -->
+      <div class="qty-row">
+        <span style="font-size:0.82rem; font-weight:700;">PRINT QUANTITY</span>
+        <div class="stepper">
+          <button type="button" class="step-btn" onclick="changeQty(-1)">-</button>
+          <span class="qty-val" id="qtyDisplay">1</span>
+          <button type="button" class="step-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+
+      <!-- Add to Cart CTA -->
+      <button type="button" class="cta-btn" onclick="addToCart()">
+        <span>+ ADD PRINT TO CART</span>
+        <span id="liveItemTotal">$1.50</span>
+      </button>
+    </section>
+
+  </main>
+
+  <!-- SLIDE-OVER CART DRAWER -->
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="drawer-header">
+      <h3 class="panel-title">Your Print Order (<span id="drawerCount">0</span>)</h3>
+      <button type="button" class="close-drawer" onclick="toggleDrawer(false)">ESC ✕</button>
     </div>
-  </div>
-</div>
 
-<script>
-  const APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
-  let mode = 'photo';
-  let uploadedImg = null;
-  let rotated = false;
-  let cart = [];
+    <div class="drawer-body" id="cartList">
+      <p style="color:var(--slate-400); font-size:0.82rem;">Your kiosk print queue is empty.</p>
+    </div>
 
-  const canvas = document.getElementById('editorCanvas');
-  const ctx = canvas.getContext('2d');
+    <div class="drawer-footer">
+      <div class="summary-row">
+        <span>Prints Subtotal</span>
+        <span id="subTotalText">$0.00</span>
+      </div>
+      <div class="summary-row" id="shippingRow">
+        <span>Shipping (Free at $35+)</span>
+        <span id="shippingText">$0.00</span>
+      </div>
+      <div class="summary-total">
+        <span>ORDER TOTAL</span>
+        <span style="color:var(--blue-400);" id="grandTotalText">$0.00</span>
+      </div>
 
-  document.getElementById('fileInput').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new Image();
-      img.onload = () => {
-        uploadedImg = img;
-        renderCanvas();
-      };
-      img.src = ev.target.result;
+      <div id="paypal-button-container"></div>
+      <div id="checkoutStatus" style="font-size:0.78rem; color:var(--blue-400); margin-top:8px;"></div>
+
+      <div class="order-success" id="orderSuccessBox">
+        <strong>✓ ORDER SENT TO PRINT LAB!</strong><br>
+        Order #: <span id="confOrderNum" style="color:#fff; font-weight:800;"></span><br>
+        <span style="color:var(--slate-400);">Your 300 DPI files are queued. Check your PayPal email for receipt details.</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Added to Print Queue!</div>
+
+  <script>
+    // Replace with your deployed Google Apps Script Web App URL
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwe6DxOCeLoH_dPuMJTgipaAo4-rmp5zNYCa8XIOFOrpAPNEdsxJDgO-DzMe9MAM1db/exec';
+
+    const state = {
+      mode: 'photo',
+      img: null,
+      rotated: false,
+      filter: 'none',
+      panX: 0,
+      panY: 0,
+      dragging: false,
+      dragStartX: 0,
+      dragStartY: 0,
+      photoSize: '4x6',
+      photoW: 1200,
+      photoH: 1800,
+      photoPrice: 1.50,
+      photoFinish: 'Glossy',
+      docSize: '8.5x11',
+      docW: 2550,
+      docH: 3300,
+      docBasePrice: 0.75,
+      docStock: 'Standard_20lb',
+      docStockAdd: 0,
+      docColorHex: '#ffffff',
+      docColorName: 'White',
+      docFit: 'contain',
+      qty: 1,
+      cart: []
     };
-    reader.readAsDataURL(file);
-  });
 
-  function setMode(newMode) {
-    mode = newMode;
-    document.getElementById('tab-photo').classList.toggle('active', mode === 'photo');
-    document.getElementById('tab-doc').classList.toggle('active', mode === 'doc');
-    document.getElementById('photo-controls').classList.toggle('hidden', mode !== 'photo');
-    document.getElementById('doc-controls').classList.toggle('hidden', mode !== 'doc');
-    renderCanvas();
-  }
+    const canvas = document.getElementById('editorCanvas');
+    const ctx = canvas.getContext('2d');
 
-  function toggleOrientation() {
-    rotated = !rotated;
-    renderCanvas();
-  }
-
-  function renderCanvas() {
-    let targetW, targetH, bgColor = '#ffffff';
-
-    if (mode === 'photo') {
-      const opt = document.getElementById('photoSize').selectedOptions[0];
-      targetW = parseInt(opt.dataset.w);
-      targetH = parseInt(opt.dataset.h);
-      if (rotated) [targetW, targetH] = [targetH, targetW];
-    } else {
-      const opt = document.getElementById('docSize').selectedOptions[0];
-      targetW = parseInt(opt.dataset.w);
-      targetH = parseInt(opt.dataset.h);
-      bgColor = document.getElementById('docColor').value;
-    }
-
-    canvas.width = targetW;
-    canvas.height = targetH;
-
-    // Fill background (white for photos, selected paper color for documents)
-    ctx.save();
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, targetW, targetH);
-    ctx.restore();
-
-    if (!uploadedImg) {
-      ctx.fillStyle = '#888';
-      ctx.font = 'bold 48px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('PREVIEW AREA', targetW / 2, targetH / 2);
-      return;
-    }
-
-    ctx.save();
-    if (mode === 'photo') {
-      const b = document.getElementById('brightness').value;
-      const c = document.getElementById('contrast').value;
-      const f = document.getElementById('photoFilter').value;
-      document.getElementById('brightVal').textContent = b;
-      document.getElementById('contrastVal').textContent = c;
-      ctx.filter = `brightness(${b}%) contrast(${c}%) ${f === 'none' ? '' : f}`;
-    }
-
-    // Calculate aspect-ratio fit (cover for photo, contain/cover for document)
-    const fitMode = mode === 'photo' ? 'cover' : document.getElementById('docFit').value;
-    const scale = fitMode === 'cover'
-      ? Math.max(targetW / uploadedImg.width, targetH / uploadedImg.height)
-      : Math.min((targetW * 0.92) / uploadedImg.width, (targetH * 0.92) / uploadedImg.height);
-
-    const drawW = uploadedImg.width * scale;
-    const drawH = uploadedImg.height * scale;
-    const offsetX = (targetW - drawW) / 2;
-    const offsetY = (targetH - drawH) / 2;
-
-    ctx.drawImage(uploadedImg, offsetX, offsetY, drawW, drawH);
-    ctx.restore();
-  }
-
-  function addToCart() {
-    if (!uploadedImg) {
-      alert('Please upload a photo or document image first.');
-      return;
-    }
-
-    const qty = Math.max(1, parseInt(document.getElementById('qty').value) || 1);
-    let unitPrice = 0, specs = '';
-
-    if (mode === 'photo') {
-      const sizeOpt = document.getElementById('photoSize').selectedOptions[0];
-      const finish = document.getElementById('photoFinish').value;
-      unitPrice = parseFloat(sizeOpt.dataset.price);
-      specs = `${sizeOpt.value}_${finish}`;
-    } else {
-      const sizeOpt = document.getElementById('docSize').selectedOptions[0];
-      const stockOpt = document.getElementById('docStock').selectedOptions[0];
-      const colorOpt = document.getElementById('docColor').selectedOptions[0];
-      unitPrice = parseFloat(sizeOpt.dataset.price) + parseFloat(stockOpt.dataset.add);
-      specs = `${sizeOpt.value}_${stockOpt.value}_${colorOpt.dataset.name}`;
-    }
-
-    // Export high-res PNG from the current 300 DPI canvas
-    const highResPng = canvas.toDataURL('image/png');
-
-    cart.push({
-      id: Date.now(),
-      type: mode.toUpperCase(),
-      specs: specs,
-      qty: qty,
-      unitPrice: unitPrice,
-      subtotal: unitPrice * qty,
-      imageData: highResPng
+    // File Upload Handler
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('fileNameDisplay').textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const image = new Image();
+        image.onload = () => {
+          state.img = image;
+          state.panX = 0;
+          state.panY = 0;
+          renderCanvas();
+          showToast('Image loaded at 300 DPI!');
+        };
+        image.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
     });
 
-    updateCartUI();
-  }
+    // Interactive Drag-to-Pan on Canvas
+    canvas.addEventListener('mousedown', (e) => {
+      if (!state.img) return;
+      state.dragging = true;
+      state.dragStartX = e.clientX;
+      state.dragStartY = e.clientY;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!state.dragging) return;
+      const dx = (e.clientX - state.dragStartX) * 3;
+      const dy = (e.clientY - state.dragStartY) * 3;
+      state.dragStartX = e.clientX;
+      state.dragStartY = e.clientY;
+      state.panX += dx;
+      state.panY += dy;
+      renderCanvas();
+    });
+    window.addEventListener('mouseup', () => { state.dragging = false; });
 
-  function removeFromCart(id) {
-    cart = cart.filter(item => item.id !== id);
-    updateCartUI();
-  }
-
-  function getCartTotal() {
-    return cart.reduce((sum, item) => sum + item.subtotal, 0);
-  }
-
-  function updateCartUI() {
-    const list = document.getElementById('cartList');
-    document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.qty, 0);
-    document.getElementById('cartTotal').textContent = getCartTotal().toFixed(2);
-
-    if (cart.length === 0) {
-      list.innerHTML = '<p style="color:#666; font-size:0.85rem;">No prints added yet.</p>';
-      return;
+    function setMode(newMode) {
+      state.mode = newMode;
+      document.getElementById('modePhotoBtn').classList.toggle('active', newMode === 'photo');
+      document.getElementById('modeDocBtn').classList.toggle('active', newMode === 'doc');
+      document.getElementById('photoOptions').classList.toggle('hidden', newMode !== 'photo');
+      document.getElementById('docOptions').classList.toggle('hidden', newMode !== 'doc');
+      updatePricingUI();
+      renderCanvas();
     }
 
-    list.innerHTML = cart.map(item => `
-      <div class="cart-item">
-        <img src="${item.imageData}" alt="Preview" />
-        <div style="flex:1;">
-          <strong>${item.type}</strong> (${item.specs})<br>
-          Qty: ${item.qty} × $${item.unitPrice.toFixed(2)} = <strong>$${item.subtotal.toFixed(2)}</strong>
-        </div>
-        <button class="remove-btn" onclick="removeFromCart(${item.id})">X</button>
-      </div>
-    `).join('');
-  }
+    function selectSize(el, type) {
+      const grid = el.parentElement;
+      grid.querySelectorAll('.size-tile').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
 
-  // PayPal Smart Buttons Integration
-  paypal.Buttons({
-    createOrder: function(data, actions) {
-      const total = getCartTotal();
-      if (total <= 0) {
-        alert('Your cart is empty!');
+      if (type === 'photo') {
+        state.photoSize = el.dataset.size;
+        state.photoW = parseInt(el.dataset.w);
+        state.photoH = parseInt(el.dataset.h);
+        state.photoPrice = parseFloat(el.dataset.price);
+      } else {
+        state.docSize = el.dataset.size;
+        state.docW = parseInt(el.dataset.w);
+        state.docH = parseInt(el.dataset.h);
+        state.docBasePrice = parseFloat(el.dataset.price);
+      }
+      updatePricingUI();
+      renderCanvas();
+    }
+
+    function selectChip(key, val, btn) {
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state[key] = val;
+      updatePricingUI();
+    }
+
+    function selectStock(stockName, addPrice, btn) {
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.docStock = stockName;
+      state.docStockAdd = addPrice;
+      updatePricingUI();
+    }
+
+    function selectPaperColor(hex, name, btn) {
+      btn.parentElement.querySelectorAll('.swatch-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.docColorHex = hex;
+      state.docColorName = name;
+      renderCanvas();
+    }
+
+    function selectFit(fitMode, btn) {
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.docFit = fitMode;
+      renderCanvas();
+    }
+
+    function setFilter(filterVal, btn) {
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => {
+        if (b.id && b.id.startsWith('flt-')) b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      state.filter = filterVal;
+      renderCanvas();
+    }
+
+    function rotateCanvas() {
+      state.rotated = !state.rotated;
+      renderCanvas();
+    }
+
+    function resetAdjustments() {
+      state.panX = 0;
+      state.panY = 0;
+      document.getElementById('zoomRange').value = 100;
+      document.getElementById('brightRange').value = 100;
+      document.getElementById('contrastRange').value = 100;
+      renderCanvas();
+    }
+
+    function changeQty(delta) {
+      state.qty = Math.max(1, Math.min(250, state.qty + delta));
+      document.getElementById('qtyDisplay').textContent = state.qty;
+      updatePricingUI();
+    }
+
+    function getCurrentUnitPrice() {
+      return state.mode === 'photo'
+        ? state.photoPrice
+        : (state.docBasePrice + state.docStockAdd);
+    }
+
+    function updatePricingUI() {
+      const total = getCurrentUnitPrice() * state.qty;
+      document.getElementById('liveItemTotal').textContent = '$' + total.toFixed(2);
+      document.getElementById('activeSku').textContent = state.mode === 'photo'
+        ? `SKU: PHOTO-${state.photoSize.toUpperCase()}-${state.photoFinish.toUpperCase()}`
+        : `SKU: DOC-${state.docSize.toUpperCase()}-${state.docColorName.toUpperCase()}`;
+    }
+
+    function renderCanvas() {
+      let w = state.mode === 'photo' ? state.photoW : state.docW;
+      let h = state.mode === 'photo' ? state.photoH : state.docH;
+      if (state.rotated) [w, h] = [h, w];
+
+      canvas.width = w;
+      canvas.height = h;
+      document.getElementById('canvasDimLabel').textContent = `${w} × ${h} PX (300 DPI)`;
+
+      // Paper Surface Fill
+      ctx.save();
+      ctx.fillStyle = state.mode === 'photo' ? '#ffffff' : state.docColorHex;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+
+      if (!state.img) {
+        ctx.fillStyle = state.mode === 'photo' ? '#94a3b8' : '#475569';
+        ctx.font = '800 54px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('UPLOAD FILE TO PREVIEW', w / 2, h / 2 - 20);
+        ctx.font = '400 34px "JetBrains Mono", monospace';
+        ctx.fillText(`${w} × ${h}px Print Area`, w / 2, h / 2 + 40);
         return;
       }
-      return actions.order.create({
-        purchase_units: [{
-          description: 'OllyIsAFish PrintShop Custom Order',
-          amount: { value: total.toFixed(2) }
-        }]
-      });
-    },
-    onApprove: function(data, actions) {
-      document.getElementById('status-msg').textContent = 'Payment approved! Uploading high-res print files...';
-      return actions.order.capture().then(async function(details) {
-        const orderId = 'ORD-' + Date.now().toString().slice(-6);
-        const shipping = details.purchase_units[0].shipping;
-        const addr = shipping ? `${shipping.address.address_line_1}\n${shipping.address.admin_area_2}, ${shipping.address.admin_area_1} ${shipping.address.postal_code}` : 'No shipping address provided';
 
-        const payload = {
-          orderId: orderId,
-          paypalOrderId: details.id,
-          total: getCartTotal().toFixed(2),
-          customer: {
-            name: shipping ? shipping.name.full_name : details.payer.name.given_name,
-            email: details.payer.email_address,
-            address: addr
-          },
-          items: cart
-        };
+      const zoom = parseInt(document.getElementById('zoomRange').value) / 100;
+      const bright = document.getElementById('brightRange').value;
+      const contrast = document.getElementById('contrastRange').value;
 
-        try {
-          // Send to Google Apps Script (no-cors mode avoids browser preflight block while still executing POST)
-          await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(payload)
-          });
+      document.getElementById('zoomVal').textContent = Math.round(zoom * 100) + '%';
+      document.getElementById('brightVal').textContent = bright + '%';
+      document.getElementById('contrastVal').textContent = contrast + '%';
 
-          document.getElementById('status-msg').textContent = '';
-          document.getElementById('conf-order-id').textContent = orderId;
-          document.getElementById('order-confirmation').style.display = 'block';
-          cart = [];
-          updateCartUI();
-        } catch (err) {
-          document.getElementById('status-msg').textContent = 'Payment captured, but upload had a network hiccup. Contact us with PayPal ID: ' + details.id;
-        }
-      });
+      ctx.save();
+      ctx.filter = `brightness(${bright}%) contrast(${contrast}%) ${state.filter === 'none' ? '' : state.filter}`;
+
+      const fitMode = state.mode === 'photo' ? 'cover' : state.docFit;
+      const baseScale = fitMode === 'cover'
+        ? Math.max(w / state.img.width, h / state.img.height)
+        : Math.min((w * 0.92) / state.img.width, (h * 0.92) / state.img.height);
+
+      const finalScale = baseScale * zoom;
+      const drawW = state.img.width * finalScale;
+      const drawH = state.img.height * finalScale;
+      const drawX = (w - drawW) / 2 + state.panX;
+      const drawY = (h - drawH) / 2 + state.panY;
+
+      ctx.drawImage(state.img, drawX, drawY, drawW, drawH);
+      ctx.restore();
     }
-  }).render('#paypal-button-container');
 
-  renderCanvas();
-</script>
+    function addToCart() {
+      if (!state.img) {
+        showToast('Upload a photo or document first!', true);
+        return;
+      }
+
+      const unitPrice = getCurrentUnitPrice();
+      const specs = state.mode === 'photo'
+        ? `${state.photoSize}_${state.photoFinish}`
+        : `${state.docSize}_${state.docStock}_${state.docColorName}`;
+
+      const highResPng = canvas.toDataURL('image/png');
+
+      state.cart.push({
+        id: Date.now(),
+        type: state.mode.toUpperCase(),
+        specs: specs,
+        qty: state.qty,
+        unitPrice: unitPrice,
+        subtotal: unitPrice * state.qty,
+        imageData: highResPng
+      });
+
+      renderCart();
+      showToast(`Added ${state.qty}× ${specs} to cart!`);
+    }
+
+    function removeCartItem(id) {
+      state.cart = state.cart.filter(item => item.id !== id);
+      renderCart();
+    }
+
+    function getTotals() {
+      const subtotal = state.cart.reduce((sum, i) => sum + i.subtotal, 0);
+      const shipping = subtotal === 0 ? 0 : (subtotal >= 35.00 ? 0 : 6.95);
+      return { subtotal, shipping, grandTotal: subtotal + shipping };
+    }
+
+    function renderCart() {
+      const totalQty = state.cart.reduce((s, i) => s + i.qty, 0);
+      document.getElementById('headerBadge').textContent = totalQty;
+      document.getElementById('drawerCount').textContent = totalQty;
+
+      const list = document.getElementById('cartList');
+      if (state.cart.length === 0) {
+        list.innerHTML = '<p style="color:var(--slate-400); font-size:0.82rem;">Your kiosk print queue is empty.</p>';
+      } else {
+        list.innerHTML = state.cart.map(item => `
+          <div class="cart-card">
+            <img src="${item.imageData}" alt="Print Preview" />
+            <div class="cart-info">
+              <strong>${item.type} • ${item.specs.replace(/_/g, ' ')}</strong><br>
+              <span style="color:var(--slate-400);">Qty: ${item.qty} × $${item.unitPrice.toFixed(2)}</span><br>
+              <span style="color:var(--blue-400); font-weight:700;">$${item.subtotal.toFixed(2)}</span>
+            </div>
+            <button type="button" class="cart-del" onclick="removeCartItem(${item.id})">✕</button>
+          </div>
+        `).join('');
+      }
+
+      const { subtotal, shipping, grandTotal } = getTotals();
+      document.getElementById('subTotalText').textContent = '$' + subtotal.toFixed(2);
+      const shipRow = document.getElementById('shippingRow');
+      if (subtotal >= 35.00) {
+        shipRow.classList.add('free');
+        document.getElementById('shippingText').textContent = 'FREE ($0.00)';
+      } else {
+        shipRow.classList.remove('free');
+        document.getElementById('shippingText').textContent = '$' + shipping.toFixed(2);
+      }
+      document.getElementById('grandTotalText').textContent = '$' + grandTotal.toFixed(2);
+    }
+
+    function toggleDrawer(open) {
+      document.getElementById('cartDrawer').classList.toggle('open', open);
+      document.getElementById('drawerBackdrop').classList.toggle('open', open);
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.toggle('error', isError);
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    // PayPal Checkout Integration
+    paypal.Buttons({
+      style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'pay' },
+      createOrder: function(data, actions) {
+        const { subtotal, shipping, grandTotal } = getTotals();
+        if (grandTotal <= 0) {
+          showToast('Add at least one print to your cart first!', true);
+          return;
+        }
+        return actions.order.create({
+          purchase_units: [{
+            description: 'PrintShop.ollyisafish.com Custom Print Order',
+            amount: {
+              currency_code: 'USD',
+              value: grandTotal.toFixed(2),
+              breakdown: {
+                item_total: { currency_code: 'USD', value: subtotal.toFixed(2) },
+                shipping: { currency_code: 'USD', value: shipping.toFixed(2) }
+              }
+            }
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        document.getElementById('checkoutStatus').textContent = 'Payment verified! Uploading 300 DPI files to Google Drive...';
+        return actions.order.capture().then(async function(details) {
+          const orderId = 'ORD-' + Date.now().toString().slice(-6);
+          const shipping = details.purchase_units[0].shipping;
+          const addr = shipping
+            ? `${shipping.address.address_line_1}\n${shipping.address.admin_area_2}, ${shipping.address.admin_area_1} ${shipping.address.postal_code}`
+            : 'No shipping address provided';
+
+          const payload = {
+            orderId: orderId,
+            paypalOrderId: details.id,
+            total: getTotals().grandTotal.toFixed(2),
+            customer: {
+              name: shipping ? shipping.name.full_name : details.payer.name.given_name,
+              email: details.payer.email_address,
+              address: addr
+            },
+            items: state.cart
+          };
+
+          try {
+            await fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'text/plain' },
+              body: JSON.stringify(payload)
+            });
+
+            document.getElementById('checkoutStatus').textContent = '';
+            document.getElementById('confOrderNum').textContent = orderId;
+            document.getElementById('orderSuccessBox').style.display = 'block';
+            state.cart = [];
+            renderCart();
+            showToast('Order ' + orderId + ' placed!');
+          } catch (err) {
+            document.getElementById('checkoutStatus').textContent = 'Payment complete, network hiccup on upload. Save PayPal ID: ' + details.id;
+            showToast('Upload hiccup—save your PayPal ID', true);
+          }
+        });
+      }
+    }).render('#paypal-button-container');
+
+    updatePricingUI();
+    renderCanvas();
+  </script>
 </body>
 </html>
