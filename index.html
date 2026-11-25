@@ -8,8 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
-  <!-- Replace YOUR_PAYPAL_CLIENT_ID with your live PayPal Client ID -->
-  <script src="https://www.paypal.com/sdk/js?currency=USD&client-id=BAA40StwGiqW8zUc_WjTtH4QiXCFjdqd-BpXmdJYwU1WCpdkaZiCNl1sy0-IU0U-N51EihgabLR-7reF_Q""></script>
+  
+  <!-- PayPal SDK -->
+  <script src="https://www.paypal.com/sdk/js?currency=USD&client-id=BAA40StwGiqW8zUc_WjTtH4QiXCFjdqd-BpXmdJYwU1WCpdkaZiCNl1sy0-IU0U-N51EihgabLR-7reF_Q"></script>
+  
+  <!-- PDF.js (Rendering Multi-Page PDFs) & jsPDF (Generating Print-Ready PDFs) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     :root {
       --bg-canvas: #05001F;
@@ -33,7 +39,6 @@
 
     * { box-sizing: border-box; }
 
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg-canvas); }
     ::-webkit-scrollbar-thumb { background: var(--blue-600); border-radius: 4px; }
@@ -50,7 +55,6 @@
       overflow-x: hidden;
     }
 
-    /* Watermark */
     .watermark {
       position: fixed;
       bottom: 16px;
@@ -62,7 +66,6 @@
       z-index: 1;
     }
 
-    /* Free Shipping Top Banner */
     .shipping-banner {
       background: var(--navy-banner);
       border-bottom: 1px solid var(--navy-border);
@@ -74,7 +77,6 @@
       letter-spacing: 0.3px;
     }
 
-    /* Sticky Kiosk Header */
     header {
       position: sticky;
       top: 0;
@@ -88,35 +90,12 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .brand img {
-      width: 34px;
-      height: 34px;
-      object-fit: contain;
-      border-radius: 6px;
-    }
-    .brand-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--blue-400);
-      margin: 0;
-    }
-    .brand-sub {
-      font-size: 0.72rem;
-      color: var(--slate-400);
-      display: block;
-    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand img { width: 34px; height: 34px; object-fit: contain; border-radius: 6px; }
+    .brand-title { font-size: 1.2rem; font-weight: 800; color: var(--blue-400); margin: 0; }
+    .brand-sub { font-size: 0.72rem; color: var(--slate-400); display: block; }
 
-    /* Kiosk Step Pills */
-    .kiosk-steps {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
+    .kiosk-steps { display: flex; gap: 8px; align-items: center; }
     .step-pill {
       background: var(--slate-800);
       border: 1px solid var(--slate-700);
@@ -132,7 +111,6 @@
       background: rgba(59, 130, 246, 0.15);
     }
 
-    /* Cart Trigger Button */
     .cart-trigger {
       position: relative;
       background: var(--slate-800);
@@ -149,10 +127,7 @@
       gap: 8px;
       transition: 0.15s;
     }
-    .cart-trigger:hover {
-      border-color: var(--blue-400);
-      background: var(--slate-700);
-    }
+    .cart-trigger:hover { border-color: var(--blue-400); background: var(--slate-700); }
     .cart-badge {
       background: var(--red-600);
       color: var(--text-white);
@@ -162,7 +137,6 @@
       border-radius: 999px;
     }
 
-    /* Main Kiosk Workspace */
     .kiosk-container {
       max-width: 1280px;
       width: 100%;
@@ -204,12 +178,8 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .sku-tag {
-      font-size: 0.72rem;
-      color: var(--slate-400);
-    }
+    .sku-tag { font-size: 0.72rem; color: var(--slate-400); }
 
-    /* Service Mode Cards (Walmart/CVS Kiosk Style) */
     .mode-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -232,18 +202,9 @@
       border-color: var(--blue-600);
       background: rgba(59, 130, 246, 0.14);
     }
-    .mode-card strong {
-      display: block;
-      font-size: 0.95rem;
-      color: var(--text-white);
-      margin-bottom: 4px;
-    }
-    .mode-card span {
-      font-size: 0.74rem;
-      color: var(--slate-400);
-    }
+    .mode-card strong { display: block; font-size: 0.95rem; color: var(--text-white); margin-bottom: 4px; }
+    .mode-card span { font-size: 0.74rem; color: var(--slate-400); }
 
-    /* 1. Fixed Upload Dropzone */
     .upload-zone {
       display: block;
       width: 100%;
@@ -256,10 +217,7 @@
       transition: 0.15s;
       margin-bottom: 16px;
     }
-    .upload-zone:hover {
-      border-color: var(--blue-400);
-      background: rgba(30, 41, 59, 0.8);
-    }
+    .upload-zone:hover { border-color: var(--blue-400); background: rgba(30, 41, 59, 0.8); }
     .upload-zone input { display: none; }
     .upload-btn-label {
       display: inline-block;
@@ -273,14 +231,81 @@
       border-radius: 6px;
       margin-bottom: 8px;
     }
-    .upload-hint {
-      display: block;
-      font-size: 0.74rem;
+    .upload-hint { display: block; font-size: 0.74rem; color: var(--slate-400); word-break: break-word; }
+
+    /* Multi-Page PDF Navigator Bar */
+    .pdf-nav-bar {
+      background: var(--slate-800);
+      border: 1px solid var(--blue-600);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .pdf-pager {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pdf-page-indicator {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--blue-400);
+      min-width: 115px;
+      text-align: center;
+    }
+    .pdf-page-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-white);
+      cursor: pointer;
+      background: var(--slate-900);
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--slate-700);
+    }
+    .pdf-page-toggle input {
+      accent-color: var(--blue-600);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+    .pdf-page-pills {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+    }
+    .page-tab {
+      background: var(--slate-800);
+      border: 1px solid var(--slate-700);
       color: var(--slate-400);
-      word-break: break-word;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .page-tab.active {
+      background: var(--blue-600);
+      border-color: var(--blue-400);
+      color: var(--text-white);
+    }
+    .page-tab.excluded {
+      opacity: 0.45;
+      text-decoration: line-through;
     }
 
-    /* Darkroom Canvas Stage */
     .canvas-stage {
       background: #02010a;
       border: 1px solid var(--slate-700);
@@ -302,13 +327,8 @@
       border: 1px solid var(--slate-700);
     }
     canvas:active { cursor: grabbing; }
-    .canvas-tip {
-      margin-top: 10px;
-      font-size: 0.72rem;
-      color: var(--slate-400);
-    }
+    .canvas-tip { margin-top: 10px; font-size: 0.72rem; color: var(--slate-400); }
 
-    /* Kiosk Toolbar Sliders & Buttons */
     .editor-toolbar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -329,17 +349,8 @@
       margin-bottom: 4px;
       font-weight: 700;
     }
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--blue-600);
-      cursor: pointer;
-    }
-    .tool-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
+    input[type="range"] { width: 100%; accent-color: var(--blue-600); cursor: pointer; }
+    .tool-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
     .chip-btn {
       background: var(--slate-800);
       border: 1px solid var(--slate-700);
@@ -353,13 +364,9 @@
       transition: 0.15s;
     }
     .chip-btn:hover { border-color: var(--blue-400); color: var(--text-white); }
-    .chip-btn.active {
-      background: var(--blue-600);
-      border-color: var(--blue-400);
-      color: var(--text-white);
-    }
+    .chip-btn.active { background: var(--blue-600); border-color: var(--blue-400); color: var(--text-white); }
+    .chip-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* Right Column: Size Tiles & Options */
     .size-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -378,20 +385,9 @@
       transition: 0.15s;
     }
     .size-tile:hover { border-color: var(--blue-400); }
-    .size-tile.active {
-      border-color: var(--blue-600);
-      background: rgba(59, 130, 246, 0.15);
-    }
-    .size-name {
-      font-weight: 800;
-      font-size: 0.9rem;
-      color: var(--text-white);
-    }
-    .size-dim {
-      display: block;
-      font-size: 0.7rem;
-      color: var(--slate-400);
-    }
+    .size-tile.active { border-color: var(--blue-600); background: rgba(59, 130, 246, 0.15); }
+    .size-name { font-weight: 800; font-size: 0.9rem; color: var(--text-white); }
+    .size-dim { display: block; font-size: 0.7rem; color: var(--slate-400); }
     .price-badge {
       background: var(--navy-banner);
       border: 1px solid var(--navy-border);
@@ -412,7 +408,6 @@
       text-transform: uppercase;
     }
 
-    /* Swatch Buttons for Document Paper Color */
     .swatch-row { display: flex; gap: 10px; flex-wrap: wrap; }
     .swatch-btn {
       display: flex;
@@ -428,14 +423,8 @@
       cursor: pointer;
     }
     .swatch-btn.active { border-color: var(--blue-600); color: var(--text-white); }
-    .swatch-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 1px solid #475569;
-    }
+    .swatch-dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid #475569; }
 
-    /* Quantity Stepper */
     .qty-row {
       display: flex;
       align-items: center;
@@ -460,15 +449,8 @@
       cursor: pointer;
     }
     .step-btn:hover { border-color: var(--blue-400); }
-    .qty-val {
-      font-size: 1.05rem;
-      font-weight: 800;
-      min-width: 28px;
-      text-align: center;
-      color: var(--text-white);
-    }
+    .qty-val { font-size: 1.05rem; font-weight: 800; min-width: 28px; text-align: center; color: var(--text-white); }
 
-    /* Primary CTA Button */
     .cta-btn {
       width: 100%;
       background: var(--blue-600);
@@ -486,8 +468,8 @@
       align-items: center;
     }
     .cta-btn:hover { background: var(--blue-500); }
+    .cta-btn:disabled { opacity: 0.6; cursor: wait; }
 
-    /* Slide-Over Cart Drawer */
     .drawer-backdrop {
       position: fixed;
       inset: 0;
@@ -498,7 +480,6 @@
     }
     .drawer-backdrop.open { display: block; }
 
-    /* 2. Fixed Scrollable Cart & PayPal Drawer */
     .cart-drawer {
       position: fixed;
       top: 0;
@@ -539,31 +520,7 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .drawer-body {
-      padding: 16px 20px;
-      flex: 0 0 auto;
-    }
-    .drawer-footer {
-      padding: 16px 20px 40px;
-      border-top: 1px solid var(--slate-700);
-      background: #d4d4d4;
-      flex: 1 0 auto;
-    }
-    .close-drawer {
-      background: var(--slate-800);
-      border: 1px solid var(--slate-700);
-      color: var(--text-main);
-      font-family: var(--font-mono);
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .drawer-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 20px;
-    }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
     .cart-card {
       background: var(--slate-800);
       border: 1px solid var(--slate-700);
@@ -596,7 +553,7 @@
     }
 
     .drawer-footer {
-      padding: 16px 20px;
+      padding: 16px 20px 40px;
       border-top: 1px solid var(--slate-700);
       background: white;
     }
@@ -605,9 +562,9 @@
       justify-content: space-between;
       font-size: 0.82rem;
       margin-bottom: 6px;
-      color: var(--slate-400);
+      color: var(--slate-700);
     }
-    .summary-row.free { color: var(--emerald-400); font-weight: 700; }
+    .summary-row.free { color: var(--emerald-600); font-weight: 700; }
     .summary-total {
       display: flex;
       justify-content: space-between;
@@ -620,19 +577,18 @@
       margin-bottom: 14px;
     }
 
-    /* Confirmation Box */
     .order-success {
       display: none;
-      background: rgba(5, 150, 105, 0.15);
+      background: rgba(5, 150, 105, 0.95);
       border: 1px solid var(--emerald-600);
+      color: #fff;
       border-radius: 8px;
       padding: 14px;
       margin-top: 12px;
       font-size: 0.8rem;
     }
-    .order-success strong { color: var(--emerald-400); font-size: 0.92rem; }
+    .order-success strong { color: #fff; font-size: 0.92rem; }
 
-    /* Toast Notification */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -652,19 +608,54 @@
     .toast.error { background: var(--red-600); }
 
     .hidden { display: none !important; }
+
+    /* Kiosk Footer */
+    .kiosk-footer {
+      margin-top: auto;
+      background: var(--slate-900);
+      border-top: 1px solid var(--navy-border);
+      padding: 18px 24px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--slate-400);
+      position: relative;
+      z-index: 2;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .footer-links a {
+      color: var(--blue-400);
+      text-decoration: none;
+      font-weight: 700;
+      transition: 0.15s;
+    }
+    .footer-links a:hover {
+      color: var(--text-white);
+      text-decoration: underline;
+    }
+    .footer-sep {
+      color: var(--slate-700);
+    }
+    .footer-copy {
+      font-size: 0.72rem;
+      color: var(--slate-400);
+    }
   </style>
 </head>
 <body>
 
-  <!-- Watermark -->
   <img src="logo.png" alt="" class="watermark" onerror="this.style.display='none'" />
 
-  <!-- Top Shipping Promo Bar -->
   <div class="shipping-banner">
     Free Shipping on orders over $35.00 • Flat $6.95 shipping under $35
   </div>
 
-  <!-- Sticky Kiosk Header -->
   <header>
     <div class="brand">
       <img src="logo.png" alt="Logo" onerror="this.style.display='none'" />
@@ -686,7 +677,6 @@
     </button>
   </header>
 
-  <!-- Main Kiosk Grid -->
   <main class="kiosk-container">
 
     <!-- LEFT PANEL: UPLOAD & CANVAS STUDIO -->
@@ -696,44 +686,57 @@
         <span class="sku-tag" id="canvasDimLabel">1200 × 1800 PX (300 DPI)</span>
       </div>
 
-      <!-- Kiosk Service Selector -->
       <div class="mode-grid">
         <button type="button" class="mode-card active" id="modePhotoBtn" onclick="setMode('photo')">
           <strong>PHOTO PRINTS</strong>
           <span>Glossy or Matte Photo Paper</span>
         </button>
         <button type="button" class="mode-card" id="modeDocBtn" onclick="setMode('doc')">
-          <strong>DOCUMENT PRINTS</strong>
-          <span>Standard, Cardstock & Colored Paper</span>
+          <strong>DOCUMENT / PDF PRINTS</strong>
+          <span>Multi-Page PDFs, Cardstock & Tints</span>
         </button>
       </div>
 
-      <!-- Touch Upload Zone -->
       <label class="upload-zone" for="fileInput">
-        <input type="file" id="fileInput" accept="image/*" />
-        <span class="upload-btn-label">+ SELECT FILE FROM DEVICE</span>
-        <span class="upload-hint" id="fileNameDisplay">Supports high-res PNG, JPG, WEBP</span>
+        <input type="file" id="fileInput" accept="image/*,application/pdf" />
+        <span class="upload-btn-label">+ SELECT IMAGE OR PDF FROM DEVICE</span>
+        <span class="upload-hint" id="fileNameDisplay">Supports multi-page PDF, PNG, JPG, WEBP</span>
       </label>
 
-      <!-- Darkroom Preview Canvas -->
-      <div class="canvas-stage">
-        <canvas id="editorCanvas" width="1200" height="1800"></canvas>
-        <div class="canvas-tip">TIP: Drag image inside frame to adjust crop position</div>
+      <!-- Multi-Page PDF Controls (Hidden until a PDF is loaded) -->
+      <div id="pdfControlsWrapper" class="hidden">
+        <div class="pdf-nav-bar">
+          <div class="pdf-pager">
+            <button type="button" class="chip-btn" id="prevPageBtn" onclick="changePdfPage(-1)">◀ PREV</button>
+            <span class="pdf-page-indicator" id="pdfPageIndicator">PAGE 1 OF 1</span>
+            <button type="button" class="chip-btn" id="nextPageBtn" onclick="changePdfPage(1)">NEXT ▶</button>
+          </div>
+          <label class="pdf-page-toggle">
+            <input type="checkbox" id="includePageCheck" checked onchange="toggleCurrentPageInclude()" />
+            <span>PRINT THIS PAGE</span>
+          </label>
+          <button type="button" class="chip-btn" onclick="applyEditsToAllPages()">APPLY CROP/TONE TO ALL</button>
+        </div>
+        <div class="pdf-page-pills" id="pdfPagePills"></div>
       </div>
 
-      <!-- Photo / Canvas Adjustment Controls -->
+      <div class="canvas-stage">
+        <canvas id="editorCanvas" width="1200" height="1800"></canvas>
+        <div class="canvas-tip">TIP: Drag inside frame to adjust crop • Tab through PDF pages above</div>
+      </div>
+
       <div class="editor-toolbar">
         <div class="tool-group">
           <label><span>ZOOM / CROP</span><span id="zoomVal">100%</span></label>
-          <input type="range" id="zoomRange" min="50" max="220" value="100" oninput="renderCanvas()" />
+          <input type="range" id="zoomRange" min="50" max="220" value="100" oninput="onAdjustmentChange()" />
         </div>
         <div class="tool-group">
           <label><span>BRIGHTNESS</span><span id="brightVal">100%</span></label>
-          <input type="range" id="brightRange" min="60" max="150" value="100" oninput="renderCanvas()" />
+          <input type="range" id="brightRange" min="60" max="150" value="100" oninput="onAdjustmentChange()" />
         </div>
         <div class="tool-group">
           <label><span>CONTRAST</span><span id="contrastVal">100%</span></label>
-          <input type="range" id="contrastRange" min="60" max="150" value="100" oninput="renderCanvas()" />
+          <input type="range" id="contrastRange" min="60" max="150" value="100" oninput="onAdjustmentChange()" />
         </div>
       </div>
 
@@ -757,21 +760,25 @@
       <div id="photoOptions">
         <span class="option-label">Select Photo Size</span>
         <div class="size-grid" id="photoSizeGrid">
-          <div class="size-tile active" data-size="4x6" data-w="1200" data-h="1800" data-price="1.50" onclick="selectSize(this, 'photo')">
+          <div class="size-tile active" data-size="4x6" data-w="1200" data-h="1800" data-price="0.80" onclick="selectSize(this, 'photo')">
             <div><span class="size-name">4" × 6"</span><span class="size-dim">Wallet / Standard</span></div>
-            <span class="price-badge">$1.50</span>
+            <span class="price-badge">$0.80</span>
           </div>
-          <div class="size-tile" data-size="5x7" data-w="1500" data-h="2100" data-price="3.00" onclick="selectSize(this, 'photo')">
+          <div class="size-tile" data-size="5x7" data-w="1500" data-h="2100" data-price="1.20" onclick="selectSize(this, 'photo')">
             <div><span class="size-name">5" × 7"</span><span class="size-dim">Frame Ready</span></div>
+            <span class="price-badge">$1.20</span>
+          </div>
+          <div class="size-tile" data-size="8x10" data-w="2400" data-h="3000" data-price="3.00" onclick="selectSize(this, 'photo')">
+            <div><span class="size-name">8" × 10"</span><span class="size-dim">Portrait Large</span></div>
             <span class="price-badge">$3.00</span>
           </div>
-          <div class="size-tile" data-size="8x10" data-w="2400" data-h="3000" data-price="6.50" onclick="selectSize(this, 'photo')">
-            <div><span class="size-name">8" × 10"</span><span class="size-dim">Portrait Large</span></div>
-            <span class="price-badge">$6.50</span>
-          </div>
-          <div class="size-tile" data-size="11x14" data-w="3300" data-h="4200" data-price="12.00" onclick="selectSize(this, 'photo')">
+          <div class="size-tile" data-size="11x14" data-w="3300" data-h="4200" data-price="8.50" onclick="selectSize(this, 'photo')">
             <div><span class="size-name">11" × 14"</span><span class="size-dim">Poster Print</span></div>
-            <span class="price-badge">$12.00</span>
+            <span class="price-badge">$8.50</span>
+          </div>
+          <div class="size-tile" data-size="16x20" data-w="4800" data-h="6000" data-price="25.00" onclick="selectSize(this, 'photo')">
+            <div><span class="size-name">16" × 20"</span><span class="size-dim">Large Format - Uncoated</span></div>
+            <span class="price-badge">$25.00</span>
           </div>
         </div>
 
@@ -786,15 +793,15 @@
 
       <!-- DOCUMENT OPTIONS -->
       <div id="docOptions" class="hidden">
-        <span class="option-label">Select Document Size</span>
+        <span class="option-label">Select Document Size (Per Page)</span>
         <div class="size-grid" id="docSizeGrid">
           <div class="size-tile active" data-size="8.5x11" data-w="2550" data-h="3300" data-price="0.75" onclick="selectSize(this, 'doc')">
             <div><span class="size-name">8.5" × 11"</span><span class="size-dim">US Letter</span></div>
-            <span class="price-badge">$0.75</span>
+            <span class="price-badge">$0.75/pg</span>
           </div>
           <div class="size-tile" data-size="11x17" data-w="3300" data-h="5100" data-price="1.75" onclick="selectSize(this, 'doc')">
             <div><span class="size-name">11" × 17"</span><span class="size-dim">Tabloid / Ledger</span></div>
-            <span class="price-badge">$1.75</span>
+            <span class="price-badge">$1.75/pg</span>
           </div>
         </div>
 
@@ -839,7 +846,7 @@
 
       <!-- Quantity Selector -->
       <div class="qty-row">
-        <span style="font-size:0.82rem; font-weight:700;">PRINT QUANTITY</span>
+        <span style="font-size:0.82rem; font-weight:700;" id="qtyLabel">PRINT QUANTITY</span>
         <div class="stepper">
           <button type="button" class="step-btn" onclick="changeQty(-1)">-</button>
           <span class="qty-val" id="qtyDisplay">1</span>
@@ -847,14 +854,25 @@
         </div>
       </div>
 
-      <!-- Add to Cart CTA -->
-      <button type="button" class="cta-btn" onclick="addToCart()">
-        <span>+ ADD PRINT TO CART</span>
-        <span id="liveItemTotal">$1.50</span>
+      <button type="button" class="cta-btn" id="addToCartBtn" onclick="addToCart()">
+        <span id="ctaBtnLabel">+ ADD PRINT TO CART</span>
+        <span id="liveItemTotal">$0.80</span>
       </button>
     </section>
 
   </main>
+
+  <!-- Kiosk Footer -->
+  <footer class="kiosk-footer">
+    <div class="footer-links">
+      <a href="https://ollyisafish.com" target="_blank" rel="noopener">OLLYISAFISH.COM</a>
+      <span class="footer-sep">•</span>
+      <a href="https://ollyisafish.com/contact.html" target="_blank" rel="noopener">CONTACT & SUPPORT</a>
+    </div>
+    <div class="footer-copy">
+      © 2026 OllyIsAFish.com • All Rights Reserved
+    </div>
+  </footer>
 
   <!-- SLIDE-OVER CART DRAWER -->
   <div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
@@ -879,29 +897,33 @@
       </div>
       <div class="summary-total">
         <span>ORDER TOTAL</span>
-        <span style="color:var(--blue-400);" id="grandTotalText">$0.00</span>
+        <span style="color:var(--blue-600);" id="grandTotalText">$0.00</span>
       </div>
 
       <div id="paypal-button-container"></div>
-      <div id="checkoutStatus" style="font-size:0.78rem; color:var(--blue-400); margin-top:8px;"></div>
+      <div id="checkoutStatus" style="font-size:0.78rem; color:var(--blue-600); font-weight:700; margin-top:8px;"></div>
 
       <div class="order-success" id="orderSuccessBox">
         <strong>✓ ORDER SENT TO PRINT LAB!</strong><br>
         Order #: <span id="confOrderNum" style="color:#fff; font-weight:800;"></span><br>
-        <span style="color:var(--slate-400);">Your 300 DPI files are queued. Check your PayPal email for receipt details.</span>
+        <span>Your 300 DPI files & PDFs are queued. Check your PayPal email for receipt details.</span>
       </div>
     </div>
   </aside>
 
-  <!-- Toast Notification -->
   <div class="toast" id="toast">Added to Print Queue!</div>
 
   <script>
-    // Replace with your deployed Google Apps Script Web App URL
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwe6DxOCeLoH_dPuMJTgipaAo4-rmp5zNYCa8XIOFOrpAPNEdsxJDgO-DzMe9MAM1db/exec';
+    // Configure PDF.js Worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjzqgdwF71xnJJWMmOZC4j4G-cT9KXqoRJnQ2-YCR7i_az3nWkq2SpCWuAl8ho1oa0/exec';
 
     const state = {
       mode: 'photo',
+      isPdf: false,
+      pdfPages: [], // Array of { pageNum, img, included, panX, panY, zoom, bright, contrast, rotated, filter }
+      currentPageIdx: 0,
       img: null,
       rotated: false,
       filter: 'none',
@@ -913,7 +935,7 @@
       photoSize: '4x6',
       photoW: 1200,
       photoH: 1800,
-      photoPrice: 1.50,
+      photoPrice: 0.80,
       photoFinish: 'Glossy',
       docSize: '8.5x11',
       docW: 2550,
@@ -931,27 +953,175 @@
     const canvas = document.getElementById('editorCanvas');
     const ctx = canvas.getContext('2d');
 
-    // File Upload Handler
-    document.getElementById('fileInput').addEventListener('change', (e) => {
+    // File Upload Handler (Supports Images + Multi-Page PDFs)
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
       document.getElementById('fileNameDisplay').textContent = file.name;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const image = new Image();
-        image.onload = () => {
-          state.img = image;
-          state.panX = 0;
-          state.panY = 0;
-          renderCanvas();
-          showToast('Image loaded at 300 DPI!');
+
+      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+        try {
+          showToast('Rendering PDF pages at 300 DPI...');
+          const arrayBuffer = await file.arrayBuffer();
+          const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const numPages = pdfDoc.numPages;
+
+          state.isPdf = true;
+          state.pdfPages = [];
+          state.currentPageIdx = 0;
+
+          // Automatically switch to Document Mode for PDFs
+          if (state.mode !== 'doc') setMode('doc');
+
+          for (let i = 1; i <= numPages; i++) {
+            const page = await pdfDoc.getPage(i);
+            // Render at scale 3.0 (~216-300 DPI crisp vector rasterization)
+            const viewport = page.getViewport({ scale: 3.0 });
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = viewport.width;
+            tempCanvas.height = viewport.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
+
+            const pageImg = await loadImageFromDataUrl(tempCanvas.toDataURL('image/png'));
+            state.pdfPages.push({
+              pageNum: i,
+              img: pageImg,
+              included: true,
+              panX: 0,
+              panY: 0,
+              zoom: 100,
+              bright: 100,
+              contrast: 100,
+              rotated: false,
+              filter: 'none'
+            });
+          }
+
+          document.getElementById('pdfControlsWrapper').classList.remove('hidden');
+          loadPdfPageIntoEditor(0);
+          renderPdfTabs();
+          updatePricingUI();
+          showToast(`Loaded ${numPages}-page PDF!`);
+        } catch (err) {
+          console.error(err);
+          showToast('Error reading PDF file.', true);
+        }
+      } else {
+        // Standard Single Image Upload
+        state.isPdf = false;
+        state.pdfPages = [];
+        document.getElementById('pdfControlsWrapper').classList.add('hidden');
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const image = new Image();
+          image.onload = () => {
+            state.img = image;
+            state.panX = 0;
+            state.panY = 0;
+            updatePricingUI();
+            renderCanvas();
+            showToast('Image loaded at 300 DPI!');
+          };
+          image.src = ev.target.result;
         };
-        image.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      }
     });
 
-    // Interactive Drag-to-Pan on Canvas
+    function loadImageFromDataUrl(dataUrl) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.src = dataUrl;
+      });
+    }
+
+    // Save current slider/pan edits back to the active PDF page object
+    function syncCurrentPdfPageState() {
+      if (!state.isPdf || !state.pdfPages[state.currentPageIdx]) return;
+      const p = state.pdfPages[state.currentPageIdx];
+      p.panX = state.panX;
+      p.panY = state.panY;
+      p.zoom = parseInt(document.getElementById('zoomRange').value);
+      p.bright = parseInt(document.getElementById('brightRange').value);
+      p.contrast = parseInt(document.getElementById('contrastRange').value);
+      p.rotated = state.rotated;
+      p.filter = state.filter;
+    }
+
+    // Load a specific PDF page into the active canvas controls
+    function loadPdfPageIntoEditor(idx) {
+      state.currentPageIdx = idx;
+      const p = state.pdfPages[idx];
+      state.img = p.img;
+      state.panX = p.panX;
+      state.panY = p.panY;
+      state.rotated = p.rotated;
+      state.filter = p.filter;
+
+      document.getElementById('zoomRange').value = p.zoom;
+      document.getElementById('brightRange').value = p.bright;
+      document.getElementById('contrastRange').value = p.contrast;
+      document.getElementById('includePageCheck').checked = p.included;
+
+      document.querySelectorAll('[id^="flt-"]').forEach(b => b.classList.remove('active'));
+      if (p.filter === 'none') document.getElementById('flt-none').classList.add('active');
+      else if (p.filter.includes('grayscale')) document.getElementById('flt-bw').classList.add('active');
+      else document.getElementById('flt-vintage').classList.add('active');
+
+      document.getElementById('pdfPageIndicator').textContent = `PAGE ${idx + 1} OF ${state.pdfPages.length}`;
+      document.getElementById('prevPageBtn').disabled = idx === 0;
+      document.getElementById('nextPageBtn').disabled = idx === state.pdfPages.length - 1;
+
+      renderPdfTabs();
+      renderCanvas();
+    }
+
+    function changePdfPage(delta) {
+      if (!state.isPdf) return;
+      syncCurrentPdfPageState();
+      const nextIdx = Math.max(0, Math.min(state.pdfPages.length - 1, state.currentPageIdx + delta));
+      loadPdfPageIntoEditor(nextIdx);
+    }
+
+    function toggleCurrentPageInclude() {
+      if (!state.isPdf) return;
+      state.pdfPages[state.currentPageIdx].included = document.getElementById('includePageCheck').checked;
+      renderPdfTabs();
+      updatePricingUI();
+    }
+
+    function applyEditsToAllPages() {
+      if (!state.isPdf) return;
+      syncCurrentPdfPageState();
+      const src = state.pdfPages[state.currentPageIdx];
+      state.pdfPages.forEach(p => {
+        p.panX = src.panX;
+        p.panY = src.panY;
+        p.zoom = src.zoom;
+        p.bright = src.bright;
+        p.contrast = src.contrast;
+        p.rotated = src.rotated;
+        p.filter = src.filter;
+      });
+      showToast('Applied crop & tone settings to all pages!');
+    }
+
+    function renderPdfTabs() {
+      const container = document.getElementById('pdfPagePills');
+      container.innerHTML = state.pdfPages.map((p, idx) => `
+        <button type="button"
+          class="page-tab ${idx === state.currentPageIdx ? 'active' : ''} ${!p.included ? 'excluded' : ''}"
+          onclick="syncCurrentPdfPageState(); loadPdfPageIntoEditor(${idx});">
+          PG ${p.pageNum} ${p.included ? '✓' : '✕'}
+        </button>
+      `).join('');
+    }
+
+    // Drag-to-Pan on Canvas
     canvas.addEventListener('mousedown', (e) => {
       if (!state.img) return;
       state.dragging = true;
@@ -966,9 +1136,15 @@
       state.dragStartY = e.clientY;
       state.panX += dx;
       state.panY += dy;
+      syncCurrentPdfPageState();
       renderCanvas();
     });
     window.addEventListener('mouseup', () => { state.dragging = false; });
+
+    function onAdjustmentChange() {
+      syncCurrentPdfPageState();
+      renderCanvas();
+    }
 
     function setMode(newMode) {
       state.mode = newMode;
@@ -1036,11 +1212,13 @@
       });
       btn.classList.add('active');
       state.filter = filterVal;
+      syncCurrentPdfPageState();
       renderCanvas();
     }
 
     function rotateCanvas() {
       state.rotated = !state.rotated;
+      syncCurrentPdfPageState();
       renderCanvas();
     }
 
@@ -1050,6 +1228,7 @@
       document.getElementById('zoomRange').value = 100;
       document.getElementById('brightRange').value = 100;
       document.getElementById('contrastRange').value = 100;
+      syncCurrentPdfPageState();
       renderCanvas();
     }
 
@@ -1059,96 +1238,229 @@
       updatePricingUI();
     }
 
+    function getSelectedPageCount() {
+      if (!state.isPdf) return 1;
+      return state.pdfPages.filter(p => p.included).length;
+    }
+
     function getCurrentUnitPrice() {
-      return state.mode === 'photo'
-        ? state.photoPrice
-        : (state.docBasePrice + state.docStockAdd);
+      if (state.mode === 'photo') return state.photoPrice;
+      const perPage = state.docBasePrice + state.docStockAdd;
+      return perPage * getSelectedPageCount();
     }
 
     function updatePricingUI() {
+      const pageCount = getSelectedPageCount();
       const total = getCurrentUnitPrice() * state.qty;
       document.getElementById('liveItemTotal').textContent = '$' + total.toFixed(2);
+
+      if (state.isPdf) {
+        document.getElementById('qtyLabel').textContent = `COPIES (${pageCount} PG/COPY)`;
+        document.getElementById('ctaBtnLabel').textContent = `+ ADD ${pageCount}-PG PDF TO CART`;
+      } else {
+        document.getElementById('qtyLabel').textContent = 'PRINT QUANTITY';
+        document.getElementById('ctaBtnLabel').textContent = '+ ADD PRINT TO CART';
+      }
+
       document.getElementById('activeSku').textContent = state.mode === 'photo'
         ? `SKU: PHOTO-${state.photoSize.toUpperCase()}-${state.photoFinish.toUpperCase()}`
-        : `SKU: DOC-${state.docSize.toUpperCase()}-${state.docColorName.toUpperCase()}`;
+        : `SKU: ${state.isPdf ? 'PDF' : 'DOC'}-${state.docSize.toUpperCase()}-${state.docColorName.toUpperCase()}`;
     }
 
-    function renderCanvas() {
+    // Reusable Canvas Renderer
+    function drawPageToCanvas(targetCanvas, pageConfig, isExport = false) {
+      const tCtx = targetCanvas.getContext('2d');
       let w = state.mode === 'photo' ? state.photoW : state.docW;
       let h = state.mode === 'photo' ? state.photoH : state.docH;
-      if (state.rotated) [w, h] = [h, w];
+      if (pageConfig.rotated) [w, h] = [h, w];
 
-      canvas.width = w;
-      canvas.height = h;
-      document.getElementById('canvasDimLabel').textContent = `${w} × ${h} PX (300 DPI)`;
+      targetCanvas.width = w;
+      targetCanvas.height = h;
 
-      // Paper Surface Fill
-      ctx.save();
-      ctx.fillStyle = state.mode === 'photo' ? '#ffffff' : state.docColorHex;
-      ctx.fillRect(0, 0, w, h);
-      ctx.restore();
+      const usePaperTint = !isExport && state.mode === 'doc' && state.docColorHex !== '#ffffff';
 
-      if (!state.img) {
-        ctx.fillStyle = state.mode === 'photo' ? '#94a3b8' : '#475569';
-        ctx.font = '800 54px "JetBrains Mono", monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText('UPLOAD FILE TO PREVIEW', w / 2, h / 2 - 20);
-        ctx.font = '400 34px "JetBrains Mono", monospace';
-        ctx.fillText(`${w} × ${h}px Print Area`, w / 2, h / 2 + 40);
+      // 1. Paper Surface Fill (Pure white for export; selected swatch for live preview)
+      tCtx.save();
+      tCtx.fillStyle = usePaperTint ? state.docColorHex : '#ffffff';
+      tCtx.fillRect(0, 0, w, h);
+      tCtx.restore();
+
+      if (!pageConfig.img) {
+        tCtx.fillStyle = state.mode === 'photo' ? '#94a3b8' : '#475569';
+        tCtx.font = '800 54px "JetBrains Mono", monospace';
+        tCtx.textAlign = 'center';
+        tCtx.fillText('UPLOAD FILE TO PREVIEW', w / 2, h / 2 - 20);
+        tCtx.font = '400 34px "JetBrains Mono", monospace';
+        tCtx.fillText(`${w} × ${h}px Print Area`, w / 2, h / 2 + 40);
         return;
       }
 
-      const zoom = parseInt(document.getElementById('zoomRange').value) / 100;
-      const bright = document.getElementById('brightRange').value;
-      const contrast = document.getElementById('contrastRange').value;
+      const zoom = pageConfig.zoom / 100;
+      tCtx.save();
+      tCtx.filter = `brightness(${pageConfig.bright}%) contrast(${pageConfig.contrast}%) ${pageConfig.filter === 'none' ? '' : pageConfig.filter}`;
 
-      document.getElementById('zoomVal').textContent = Math.round(zoom * 100) + '%';
-      document.getElementById('brightVal').textContent = bright + '%';
-      document.getElementById('contrastVal').textContent = contrast + '%';
-
-      ctx.save();
-      ctx.filter = `brightness(${bright}%) contrast(${contrast}%) ${state.filter === 'none' ? '' : state.filter}`;
+      // 2. Simulate ink-on-colored-paper in preview only
+      if (usePaperTint) {
+        tCtx.globalCompositeOperation = 'multiply';
+      }
 
       const fitMode = state.mode === 'photo' ? 'cover' : state.docFit;
       const baseScale = fitMode === 'cover'
-        ? Math.max(w / state.img.width, h / state.img.height)
-        : Math.min((w * 0.92) / state.img.width, (h * 0.92) / state.img.height);
+        ? Math.max(w / pageConfig.img.width, h / pageConfig.img.height)
+        : Math.min((w * 0.92) / pageConfig.img.width, (h * 0.92) / pageConfig.img.height);
 
       const finalScale = baseScale * zoom;
-      const drawW = state.img.width * finalScale;
-      const drawH = state.img.height * finalScale;
-      const drawX = (w - drawW) / 2 + state.panX;
-      const drawY = (h - drawH) / 2 + state.panY;
+      const drawW = pageConfig.img.width * finalScale;
+      const drawH = pageConfig.img.height * finalScale;
+      const drawX = (w - drawW) / 2 + pageConfig.panX;
+      const drawY = (h - drawH) / 2 + pageConfig.panY;
 
-      ctx.drawImage(state.img, drawX, drawY, drawW, drawH);
-      ctx.restore();
+      tCtx.drawImage(pageConfig.img, drawX, drawY, drawW, drawH);
+      tCtx.restore();
     }
 
-    function addToCart() {
+    function renderCanvas() {
+      const zoom = parseInt(document.getElementById('zoomRange').value);
+      const bright = document.getElementById('brightRange').value;
+      const contrast = document.getElementById('contrastRange').value;
+
+      document.getElementById('zoomVal').textContent = zoom + '%';
+      document.getElementById('brightVal').textContent = bright + '%';
+      document.getElementById('contrastVal').textContent = contrast + '%';
+
+      // Preview pass (isExport = false)
+      drawPageToCanvas(canvas, {
+        img: state.img,
+        rotated: state.rotated,
+        zoom: zoom,
+        bright: bright,
+        contrast: contrast,
+        filter: state.filter,
+        panX: state.panX,
+        panY: state.panY
+      }, false);
+
+      document.getElementById('canvasDimLabel').textContent = `${canvas.width} × ${canvas.height} PX (300 DPI)`;
+    }
+
+    async function addToCart() {
       if (!state.img) {
-        showToast('Upload a photo or document first!', true);
+        showToast('Upload a photo or PDF first!', true);
         return;
       }
 
+      const btn = document.getElementById('addToCartBtn');
       const unitPrice = getCurrentUnitPrice();
-      const specs = state.mode === 'photo'
-        ? `${state.photoSize}_${state.photoFinish}`
-        : `${state.docSize}_${state.docStock}_${state.docColorName}`;
 
-      const highResPng = canvas.toDataURL('image/png');
+      if (state.isPdf) {
+        syncCurrentPdfPageState();
+        const selectedPages = state.pdfPages.filter(p => p.included);
+        if (selectedPages.length === 0) {
+          showToast('Select at least 1 PDF page to print!', true);
+          return;
+        }
 
-      state.cart.push({
-        id: Date.now(),
-        type: state.mode.toUpperCase(),
-        specs: specs,
-        qty: state.qty,
-        unitPrice: unitPrice,
-        subtotal: unitPrice * state.qty,
-        imageData: highResPng
-      });
+        btn.disabled = true;
+        document.getElementById('ctaBtnLabel').textContent = 'BUILDING MULTI-PAGE PDF...';
 
-      renderCart();
-      showToast(`Added ${state.qty}× ${specs} to cart!`);
+        await new Promise(r => setTimeout(r, 40));
+
+        try {
+          const { jsPDF } = window.jspdf;
+          const offscreen = document.createElement('canvas');
+          let pdfDoc = null;
+          let thumbDataUrl = '';
+
+          for (let i = 0; i < selectedPages.length; i++) {
+            const pCfg = selectedPages[i];
+
+            // Capture tinted thumbnail for the cart UI on page 1
+            if (i === 0) {
+              drawPageToCanvas(offscreen, pCfg, false);
+              thumbDataUrl = offscreen.toDataURL('image/jpeg', 0.75);
+            }
+
+            // Render clean white-background print pass (isExport = true) for the PDF file
+            drawPageToCanvas(offscreen, pCfg, true);
+            const printPageDataUrl = offscreen.toDataURL('image/jpeg', 0.92);
+
+            const isLandscape = offscreen.width > offscreen.height;
+            const orient = isLandscape ? 'l' : 'p';
+            const ptW = (offscreen.width / 300) * 72;
+            const ptH = (offscreen.height / 300) * 72;
+
+            if (i === 0) {
+              pdfDoc = new jsPDF({ orientation: orient, unit: 'pt', format: [ptW, ptH] });
+            } else {
+              pdfDoc.addPage([ptW, ptH], orient);
+            }
+            pdfDoc.addImage(printPageDataUrl, 'JPEG', 0, 0, ptW, ptH);
+          }
+
+          const pdfDataUri = pdfDoc.output('datauristring');
+          const specs = `${state.docSize}_${state.docStock}_${state.docColorName}_${selectedPages.length}pgs`;
+
+          state.cart.push({
+            id: Date.now(),
+            type: 'PDF_DOC',
+            mimeType: 'application/pdf',
+            pageCount: selectedPages.length,
+            specs: specs,
+            qty: state.qty,
+            unitPrice: unitPrice,
+            subtotal: unitPrice * state.qty,
+            thumbData: thumbDataUrl,
+            fileData: pdfDataUri
+          });
+
+          renderCart();
+          showToast(`Added ${state.qty}× (${selectedPages.length}-pg PDF) to cart!`);
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to compile PDF.', true);
+        } finally {
+          btn.disabled = false;
+          updatePricingUI();
+        }
+      } else {
+        // Standard Single Image / Photo
+        const specs = state.mode === 'photo'
+          ? `${state.photoSize}_${state.photoFinish}`
+          : `${state.docSize}_${state.docStock}_${state.docColorName}`;
+
+        // Tinted preview thumbnail for the cart drawer
+        const previewThumb = canvas.toDataURL('image/jpeg', 0.75);
+
+        // Clean white-background export pass for Drive
+        const exportCanvas = document.createElement('canvas');
+        drawPageToCanvas(exportCanvas, {
+          img: state.img,
+          rotated: state.rotated,
+          zoom: parseInt(document.getElementById('zoomRange').value),
+          bright: document.getElementById('brightRange').value,
+          contrast: document.getElementById('contrastRange').value,
+          filter: state.filter,
+          panX: state.panX,
+          panY: state.panY
+        }, true);
+        const highResPng = exportCanvas.toDataURL('image/png');
+
+        state.cart.push({
+          id: Date.now(),
+          type: state.mode.toUpperCase(),
+          mimeType: 'image/png',
+          pageCount: 1,
+          specs: specs,
+          qty: state.qty,
+          unitPrice: unitPrice,
+          subtotal: unitPrice * state.qty,
+          thumbData: previewThumb,
+          fileData: highResPng
+        });
+
+        renderCart();
+        showToast(`Added ${state.qty}× ${specs} to cart!`);
+      }
     }
 
     function removeCartItem(id) {
@@ -1173,7 +1485,7 @@
       } else {
         list.innerHTML = state.cart.map(item => `
           <div class="cart-card">
-            <img src="${item.imageData}" alt="Print Preview" />
+            <img src="${item.thumbData}" alt="Print Preview" />
             <div class="cart-info">
               <strong>${item.type} • ${item.specs.replace(/_/g, ' ')}</strong><br>
               <span style="color:var(--slate-400);">Qty: ${item.qty} × $${item.unitPrice.toFixed(2)}</span><br>
@@ -1234,13 +1546,16 @@
         });
       },
       onApprove: function(data, actions) {
-        document.getElementById('checkoutStatus').textContent = 'Payment verified! Uploading 300 DPI files to Google Drive...';
+        document.getElementById('checkoutStatus').textContent = 'Payment verified! Uploading 300 DPI files & PDFs to Google Drive...';
         return actions.order.capture().then(async function(details) {
           const orderId = 'ORD-' + Date.now().toString().slice(-6);
           const shipping = details.purchase_units[0].shipping;
           const addr = shipping
             ? `${shipping.address.address_line_1}\n${shipping.address.admin_area_2}, ${shipping.address.admin_area_1} ${shipping.address.postal_code}`
             : 'No shipping address provided';
+
+          // Strip preview thumbnails before sending payload so request stays lean
+          const cleanItems = state.cart.map(({ thumbData, ...rest }) => rest);
 
           const payload = {
             orderId: orderId,
@@ -1251,7 +1566,7 @@
               email: details.payer.email_address,
               address: addr
             },
-            items: state.cart
+            items: cleanItems
           };
 
           try {
