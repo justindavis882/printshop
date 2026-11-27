@@ -804,6 +804,30 @@
             <div><span class="size-name">20" × 20"</span><span class="size-dim">Matte Canvas</span></div>
             <span class="price-badge">$48.25</span>
           </div>
+          <div class="size-tile" data-size="5x7" data-w="1500" data-h="2100" data-price="10.50" onclick="selectSize(this, 'foam')">
+            <div><span class="size-name">5" × 7"</span><span class="size-dim">Matte Foam Board</span></div>
+            <span class="price-badge">$10.50</span>
+          </div>
+          <div class="size-tile" data-size="8x8" data-w="2400" data-h="2400" data-price="12.50" onclick="selectSize(this, 'foam')">
+            <div><span class="size-name">8" × 8"</span><span class="size-dim">Matte Foam Board</span></div>
+            <span class="price-badge">$12.50</span>
+          </div>
+          <div class="size-tile" data-size="8x10" data-w="2400" data-h="3000" data-price="15.50" onclick="selectSize(this, 'foam')">
+            <div><span class="size-name">8" × 10"</span><span class="size-dim">Matte Foam Board</span></div>
+            <span class="price-badge">$15.50</span>
+          </div>
+          <div class="size-tile" data-size="11x14" data-w="3300" data-h="4200" data-price="26.75" onclick="selectSize(this, 'foam')">
+            <div><span class="size-name">11" × 14"</span><span class="size-dim">Matte Foam Board</span></div>
+            <span class="price-badge">$26.75</span>
+          </div>
+          <div class="size-tile" data-size="16x16" data-w="4800" data-h="4800" data-price="26.75" onclick="selectSize(this, 'foam')">
+            <div><span class="size-name">16" × 16"</span><span class="size-dim">Matte Foam Board</span></div>
+            <span class="price-badge">$26.75</span>
+          </div>
+          <div class="size-tile" data-size="16x20" data-w="4800" data-h="6000" data-price="36.25" onclick="selectSize(this, 'foam')">
+            <div><span class="size-name">16" × 20"</span><span class="size-dim">Matte Foam Board</span></div>
+            <span class="price-badge">$36.25</span>
+          </div>
         </div>
 
         <div class="option-block" id="photoFinishBlock">
@@ -1186,16 +1210,16 @@
       grid.querySelectorAll('.size-tile').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
 
-      if (type === 'photo' || type === 'canvas') {
+      if (type === 'photo' || type === 'canvas' || type === 'foam') {
         state.photoSubType = type;
         state.photoSize = el.dataset.size;
         state.photoW = parseInt(el.dataset.w);
         state.photoH = parseInt(el.dataset.h);
         state.photoPrice = parseFloat(el.dataset.price);
         
-        // Hide Glossy/Matte finish selector for Matte Canvas
+        // Hide Glossy/Matte finish selector for Matte Canvas and Matte Foam Board
         const finishBlock = document.getElementById('photoFinishBlock');
-        if (finishBlock) finishBlock.classList.toggle('hidden', type === 'canvas');
+        if (finishBlock) finishBlock.classList.toggle('hidden', type !== 'photo');
       } else {
         state.docSize = el.dataset.size;
         state.docW = parseInt(el.dataset.w);
@@ -1293,9 +1317,13 @@
       }
 
       if (state.mode === 'photo') {
-        document.getElementById('activeSku').textContent = state.photoSubType === 'canvas'
-          ? `SKU: CANVAS-${state.photoSize.toUpperCase()}-MATTE`
-          : `SKU: PHOTO-${state.photoSize.toUpperCase()}-${state.photoFinish.toUpperCase()}`;
+        if (state.photoSubType === 'canvas') {
+          document.getElementById('activeSku').textContent = `SKU: CANVAS-${state.photoSize.toUpperCase()}-MATTE`;
+        } else if (state.photoSubType === 'foam') {
+          document.getElementById('activeSku').textContent = `SKU: FOAMBOARD-${state.photoSize.toUpperCase()}-MATTE`;
+        } else {
+          document.getElementById('activeSku').textContent = `SKU: PHOTO-${state.photoSize.toUpperCase()}-${state.photoFinish.toUpperCase()}`;
+        }
       } else {
         document.getElementById('activeSku').textContent =
           `SKU: ${state.isPdf ? 'PDF' : 'DOC'}-${state.docSize.toUpperCase()}-${state.docColorName.toUpperCase()}`;
@@ -1460,10 +1488,22 @@
       } else {
         // Standard Single Image / Photo
         // Standard Single Image / Photo / Canvas
+        // Standard Single Image / Photo / Canvas / Foam Board
         const isCanvas = state.mode === 'photo' && state.photoSubType === 'canvas';
-        const specs = state.mode === 'photo'
-          ? (isCanvas ? `${state.photoSize}_MatteCanvas` : `${state.photoSize}_${state.photoFinish}`)
-          : `${state.docSize}_${state.docStock}_${state.docColorName}`;
+        const isFoam = state.mode === 'photo' && state.photoSubType === 'foam';
+
+        let specs;
+        if (state.mode === 'photo') {
+          if (isCanvas) specs = `${state.photoSize}_MatteCanvas`;
+          else if (isFoam) specs = `${state.photoSize}_MatteFoamBoard`;
+          else specs = `${state.photoSize}_${state.photoFinish}`;
+        } else {
+          specs = `${state.docSize}_${state.docStock}_${state.docColorName}`;
+        }
+
+        let itemType = state.mode.toUpperCase();
+        if (isCanvas) itemType = 'CANVAS';
+        else if (isFoam) itemType = 'FOAM BOARD';
 
         // Tinted preview thumbnail for the cart drawer
         const previewThumb = canvas.toDataURL('image/jpeg', 0.75);
@@ -1484,7 +1524,7 @@
 
         state.cart.push({
           id: Date.now(),
-          type: isCanvas ? 'CANVAS' : state.mode.toUpperCase(),
+          type: itemType,
           mimeType: 'image/png',
           pageCount: 1,
           specs: specs,
