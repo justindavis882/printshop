@@ -806,7 +806,7 @@
           </div>
         </div>
 
-        <div class="option-block">
+        <div class="option-block" id="photoFinishBlock">
           <span class="option-label">Paper Finish</span>
           <div class="tool-actions">
             <button type="button" class="chip-btn active" onclick="selectChip('photoFinish', 'Glossy', this)">GLOSSY FINISH</button>
@@ -956,6 +956,7 @@
       dragging: false,
       dragStartX: 0,
       dragStartY: 0,
+      photoSubType: 'photo',
       photoSize: '4x6',
       photoW: 1200,
       photoH: 1800,
@@ -1185,11 +1186,16 @@
       grid.querySelectorAll('.size-tile').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
 
-      if (type === 'photo') {
+      if (type === 'photo' || type === 'canvas') {
+        state.photoSubType = type;
         state.photoSize = el.dataset.size;
         state.photoW = parseInt(el.dataset.w);
         state.photoH = parseInt(el.dataset.h);
         state.photoPrice = parseFloat(el.dataset.price);
+        
+        // Hide Glossy/Matte finish selector for Matte Canvas
+        const finishBlock = document.getElementById('photoFinishBlock');
+        if (finishBlock) finishBlock.classList.toggle('hidden', type === 'canvas');
       } else {
         state.docSize = el.dataset.size;
         state.docW = parseInt(el.dataset.w);
@@ -1286,9 +1292,14 @@
         document.getElementById('ctaBtnLabel').textContent = '+ ADD PRINT TO CART';
       }
 
-      document.getElementById('activeSku').textContent = state.mode === 'photo'
-        ? `SKU: PHOTO-${state.photoSize.toUpperCase()}-${state.photoFinish.toUpperCase()}`
-        : `SKU: ${state.isPdf ? 'PDF' : 'DOC'}-${state.docSize.toUpperCase()}-${state.docColorName.toUpperCase()}`;
+      if (state.mode === 'photo') {
+        document.getElementById('activeSku').textContent = state.photoSubType === 'canvas'
+          ? `SKU: CANVAS-${state.photoSize.toUpperCase()}-MATTE`
+          : `SKU: PHOTO-${state.photoSize.toUpperCase()}-${state.photoFinish.toUpperCase()}`;
+      } else {
+        document.getElementById('activeSku').textContent =
+          `SKU: ${state.isPdf ? 'PDF' : 'DOC'}-${state.docSize.toUpperCase()}-${state.docColorName.toUpperCase()}`;
+      }
     }
 
     // Reusable Canvas Renderer
@@ -1448,8 +1459,10 @@
         }
       } else {
         // Standard Single Image / Photo
+        // Standard Single Image / Photo / Canvas
+        const isCanvas = state.mode === 'photo' && state.photoSubType === 'canvas';
         const specs = state.mode === 'photo'
-          ? `${state.photoSize}_${state.photoFinish}`
+          ? (isCanvas ? `${state.photoSize}_MatteCanvas` : `${state.photoSize}_${state.photoFinish}`)
           : `${state.docSize}_${state.docStock}_${state.docColorName}`;
 
         // Tinted preview thumbnail for the cart drawer
@@ -1471,7 +1484,7 @@
 
         state.cart.push({
           id: Date.now(),
-          type: state.mode.toUpperCase(),
+          type: isCanvas ? 'CANVAS' : state.mode.toUpperCase(),
           mimeType: 'image/png',
           pageCount: 1,
           specs: specs,
@@ -1483,7 +1496,7 @@
         });
 
         renderCart();
-        showToast(`Added ${state.qty}× ${specs} to cart!`);
+        showToast(`Added ${state.qty}× ${specs.replace(/_/g, ' ')} to cart!`);
       }
     }
 
